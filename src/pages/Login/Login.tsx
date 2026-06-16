@@ -1,0 +1,175 @@
+import { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { api } from '../../api/client'
+import AuthLayout from '../../components/layouts/AuthLayout'
+import { useAuth } from '../../contexts/AuthContext'
+
+interface LoginResponse {
+  token: string
+  expiresIn: number
+}
+
+function decodeRole(token: string): { role: string; username: string } {
+  try {
+    const payload = JSON.parse(
+      atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+    )
+    return { role: payload.role ?? '', username: payload.username ?? '' }
+  } catch {
+    return { role: '', username: '' }
+  }
+}
+
+export default function Login() {
+  const { login } = useAuth()
+  const navigate = useNavigate()
+
+  const [identifier, setIdentifier] = useState('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!identifier.trim() || !password) return
+    setError('')
+    setLoading(true)
+
+    try {
+      const isEmail = identifier.includes('@')
+      const body = isEmail
+        ? { email: identifier.trim(), password }
+        : { username: identifier.trim(), password }
+
+      const { token, expiresIn } = await api.post<LoginResponse>('/auth/login', body, false)
+      login(token, expiresIn)
+
+      const { role, username } = decodeRole(token)
+      navigate(role === 'TEACHER' ? '/dashboard' : `/profile/${username}`, { replace: true })
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Erro ao fazer login'
+      setError(translateError(msg))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <AuthLayout title="Entrar na conta" subtitle="Acesse com username ou email">
+      <form onSubmit={handleSubmit} className="space-y-md">
+        <Field label="Username ou email">
+          <input
+            type="text"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
+            placeholder="Ex: joaosilva ou joao@ifpi.edu.br"
+            autoComplete="username"
+            required
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Senha">
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              autoComplete="current-password"
+              required
+              className={`${inputClass} pr-10`}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((v) => !v)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
+              tabIndex={-1}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                {showPassword ? 'visibility_off' : 'visibility'}
+              </span>
+            </button>
+          </div>
+        </Field>
+
+        {error && <ErrorBox message={error} />}
+
+        <div className="flex justify-end">
+          <Link to="/forgot-password" className="text-label-sm text-primary hover:underline">
+            Esqueci minha senha
+          </Link>
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className={primaryBtn}
+        >
+          {loading ? (
+            <span className="flex items-center justify-center gap-sm">
+              <Spinner /> Entrando...
+            </span>
+          ) : (
+            'Entrar'
+          )}
+        </button>
+      </form>
+
+      <p className="mt-lg text-center text-body-md text-on-surface-variant">
+        Não tem conta?{' '}
+        <Link to="/register" className="text-primary font-semibold hover:underline">
+          Cadastre-se
+        </Link>
+      </p>
+    </AuthLayout>
+  )
+}
+
+// ─── Shared helpers ───────────────────────────────────────────────────────────
+
+const inputClass =
+  'w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface placeholder:text-outline outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all'
+
+const primaryBtn =
+  'w-full bg-primary text-on-primary py-sm rounded-lg text-label-lg font-semibold hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed'
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-xs">
+      <label className="block text-label-lg text-on-surface">{label}</label>
+      {children}
+    </div>
+  )
+}
+
+function ErrorBox({ message }: { message: string }) {
+  return (
+    <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
+      <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>
+        error
+      </span>
+      {message}
+    </div>
+  )
+}
+
+function Spinner() {
+  return (
+    <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+    </svg>
+  )
+}
+
+function translateError(msg: string): string {
+  const map: Record<string, string> = {
+    Unauthorized: 'Credenciais inválidas. Verifique username/email e senha.',
+    'Invalid credentials': 'Credenciais inválidas.',
+    'Email not verified': 'Email não verificado. Acesse sua caixa de entrada e confirme o email.',
+    'User not found': 'Usuário não encontrado.',
+  }
+  return map[msg] ?? msg
+}
