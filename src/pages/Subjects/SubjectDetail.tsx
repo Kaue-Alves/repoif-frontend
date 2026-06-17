@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { api } from '../../api/client'
 import {
-  FileRecord,
+  type FileRecord,
   confirmUpload,
   deleteFile,
   formatDate,
