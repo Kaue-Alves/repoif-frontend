@@ -20,9 +20,13 @@ export function clearToken() {
   localStorage.removeItem(EXPIRY_KEY)
 }
 
-const httpClient = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3001',
-})
+const baseURL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+
+if (!baseURL.startsWith('http://') && !baseURL.startsWith('https://')) {
+  throw new Error(`VITE_API_URL deve ser uma URL absoluta (ex: https://api.exemplo.com). Valor atual: "${baseURL}"`)
+}
+
+const httpClient = axios.create({ baseURL })
 
 httpClient.interceptors.request.use((config) => {
   const token = getStoredToken()
