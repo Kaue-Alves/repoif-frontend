@@ -1,4 +1,4 @@
-const BASE = 'http://localhost:3001'
+const BASE = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
 
 const TOKEN_KEY = 'repoif_token'
 const EXPIRY_KEY = 'repoif_expiry'
