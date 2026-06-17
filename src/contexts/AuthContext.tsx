@@ -26,9 +26,11 @@ interface AuthContextValue {
 
 function decodeJWT(token: string): AuthUser | null {
   try {
-    const payload = JSON.parse(
-      atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))
+    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
+    const json = decodeURIComponent(
+      atob(base64).split('').map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join('')
     )
+    const payload = JSON.parse(json)
     if (!payload.username || !payload.role) return null
     return { sub: payload.sub ?? '', username: payload.username, role: payload.role }
   } catch {
