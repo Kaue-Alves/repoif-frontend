@@ -1,14 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { api } from '../../api/client'
 import AppLayout from '../../components/layouts/AppLayout'
-
-interface Subject {
-  id: string
-  name: string
-  description?: string
-  isPublic: boolean
-}
+import { getSubject, updateSubject, type Subject } from './subjects.service'
 
 export default function SubjectEdit() {
   const { id } = useParams<{ id: string }>()
@@ -24,8 +17,7 @@ export default function SubjectEdit() {
 
   useEffect(() => {
     if (!id) return
-    api
-      .get<Subject>(`/subjects/${id}`)
+    getSubject(id)
       .then((data) => {
         setName(data.name)
         setDescription(data.description ?? '')
@@ -44,7 +36,7 @@ export default function SubjectEdit() {
     setSaving(true)
 
     try {
-      await api.patch(`/subjects/${id}`, {
+      await updateSubject(id!, {
         name: name.trim(),
         description: description.trim() || undefined,
         isPublic,

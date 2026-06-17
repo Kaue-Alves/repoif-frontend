@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../../api/client'
 import AppLayout from '../../components/layouts/AppLayout'
+import { createSubject } from './subjects.service'
 
 export default function SubjectNew() {
   const navigate = useNavigate()
@@ -19,7 +19,7 @@ export default function SubjectNew() {
     setLoading(true)
 
     try {
-      await api.post('/subjects', { name: name.trim(), description: description.trim() || undefined, isPublic }, true)
+      await createSubject({ name: name.trim(), description: description.trim() || undefined, isPublic })
       navigate('/dashboard')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao criar disciplina.')

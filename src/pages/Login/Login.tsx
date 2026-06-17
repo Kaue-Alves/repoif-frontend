@@ -1,13 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../../api/client'
 import AuthLayout from '../../components/layouts/AuthLayout'
 import { useAuth } from '../../contexts/AuthContext'
-
-interface LoginResponse {
-  token: string
-  expiresIn: number
-}
+import { loginUser } from './login.service'
 
 function decodeRole(token: string): { role: string; username: string } {
   try {
@@ -42,7 +37,7 @@ export default function Login() {
         ? { email: identifier.trim(), password }
         : { username: identifier.trim(), password }
 
-      const { token, expiresIn } = await api.post<LoginResponse>('/auth/login', body, false)
+      const { token, expiresIn } = await loginUser(body)
       login(token, expiresIn)
 
       const { role, username } = decodeRole(token)

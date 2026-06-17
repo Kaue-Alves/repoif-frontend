@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { searchTeachers, type TeacherResult } from '../../api/users'
+import { searchTeachers, type TeacherResult } from './search.service'
 import AppLayout from '../../components/layouts/AppLayout'
 
 export default function Search() {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { api } from '../../api/client'
 import AuthLayout from '../../components/layouts/AuthLayout'
+import { resetPassword } from './resetPassword.service'
 
 export default function ResetPassword() {
   const [params] = useSearchParams()
@@ -29,7 +29,7 @@ export default function ResetPassword() {
     setLoading(true)
 
     try {
-      await api.post('/auth/reset-password', { token, newPassword }, false)
+      await resetPassword(token, newPassword)
       setSuccess(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Token inválido ou expirado.')

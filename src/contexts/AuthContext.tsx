@@ -6,7 +6,7 @@ import {
   useMemo,
   useState,
 } from 'react'
-import { clearToken, getStoredToken, storeToken } from '../api/client'
+import { clearToken, getStoredToken, storeToken } from '../utils/httpClient'
 
 export type UserRole = 'TEACHER' | 'STUDENT'
 

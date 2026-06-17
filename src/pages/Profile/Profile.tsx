@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { getUserProfile, type Subject, type UserProfile } from '../../api/users'
+import { getUserProfile, type Subject, type UserProfile } from './profile.service'
 import AppLayout from '../../components/layouts/AppLayout'
 import { useAuth } from '../../contexts/AuthContext'
 

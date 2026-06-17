@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../../api/client'
 import AuthLayout from '../../components/layouts/AuthLayout'
-
-type Role = 'TEACHER' | 'STUDENT'
+import { registerUser, type Role } from './register.service'
 
 export default function Register() {
   const navigate = useNavigate()
@@ -27,7 +25,7 @@ export default function Register() {
     setLoading(true)
 
     try {
-      await api.post('/users', { username: username.trim(), email: email.trim(), password, role }, false)
+      await registerUser({ username: username.trim(), email: email.trim(), password, role })
       setSuccess(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao cadastrar.')

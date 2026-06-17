@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { api } from '../../api/client'
 import AuthLayout from '../../components/layouts/AuthLayout'
+import { requestPasswordReset } from './forgotPassword.service'
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState('')
@@ -14,7 +14,7 @@ export default function ForgotPassword() {
     setError('')
     setLoading(true)
     try {
-      await api.post('/auth/forgot-password', { email: email.trim() }, false)
+      await requestPasswordReset(email.trim())
       setSent(true)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao enviar email.')

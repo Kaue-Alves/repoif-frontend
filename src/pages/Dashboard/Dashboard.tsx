@@ -1,16 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { api } from '../../api/client'
 import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
 import { useAuth } from '../../contexts/AuthContext'
-
-interface Subject {
-  id: string
-  name: string
-  description?: string
-  isPublic: boolean
-}
+import { deleteSubject, getSubjects, type Subject } from './dashboard.service'
 
 export default function Dashboard() {
   const { user } = useAuth()
@@ -32,7 +25,7 @@ export default function Dashboard() {
     setLoading(true)
     setError('')
     try {
-      const data = await api.get<Subject[]>('/subjects')
+      const data = await getSubjects()
       setSubjects(data)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao carregar disciplinas.')
@@ -45,7 +38,7 @@ export default function Dashboard() {
     if (!deleteTarget) return
     setDeleting(true)
     try {
-      await api.delete(`/subjects/${deleteTarget.id}`)
+      await deleteSubject(deleteTarget.id)
       setSubjects((prev) => prev.filter((s) => s.id !== deleteTarget.id))
       setDeleteTarget(null)
     } catch (err) {

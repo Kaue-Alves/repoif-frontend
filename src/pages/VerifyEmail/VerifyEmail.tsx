@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { api } from '../../api/client'
 import AuthLayout from '../../components/layouts/AuthLayout'
+import { verifyEmail } from './verifyEmail.service'
 
 type Status = 'loading' | 'success' | 'error'
 
@@ -18,8 +18,7 @@ export default function VerifyEmail() {
       return
     }
 
-    api
-      .get<void>(`/auth/verify-email?token=${token}`, false)
+    verifyEmail(token)
       .then(() => setStatus('success'))
       .catch((err: unknown) => {
         setStatus('error')

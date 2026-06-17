@@ -1,32 +1,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
-import { api } from '../../api/client'
+import ConfirmModal from '../../components/ConfirmModal'
+import AppLayout from '../../components/layouts/AppLayout'
+import { useAuth } from '../../contexts/AuthContext'
 import {
   type FileRecord,
+  type SubjectWithTeacher,
   confirmUpload,
   deleteFile,
   formatDate,
   formatFileSize,
   getDownloadUrl,
   getMimeIcon,
+  getSubject,
   getSubjectFiles,
   patchFile,
   requestUploadUrl,
   uploadToR2,
-} from '../../api/files'
-import ConfirmModal from '../../components/ConfirmModal'
-import AppLayout from '../../components/layouts/AppLayout'
-import { useAuth } from '../../contexts/AuthContext'
+} from './subjects.service'
 
-interface Subject {
-  id: string
-  name: string
-  description?: string
-  isPublic: boolean
-  teacherUsername: string
-}
-
-// ─── upload state machine ─────────────────────────────────────────────────────
 type UploadStep = 'idle' | 'picking' | 'uploading' | 'done' | 'error'
 
 interface PendingUpload {
@@ -34,7 +26,6 @@ interface PendingUpload {
   isPublic: boolean
 }
 
-// ─── inline rename state ──────────────────────────────────────────────────────
 interface RenameState {
   id: string
   value: string
@@ -46,15 +37,14 @@ export default function SubjectDetail() {
   const navigate = useNavigate()
   const { user } = useAuth()
 
-  const [subject, setSubject] = useState<Subject | null>(
-    (location.state as { subject?: Subject })?.subject ?? null
+  const [subject, setSubject] = useState<SubjectWithTeacher | null>(
+    (location.state as { subject?: SubjectWithTeacher })?.subject ?? null
   )
   const [loadingSubject, setLoadingSubject] = useState(!subject)
   const [files, setFiles] = useState<FileRecord[]>([])
   const [loadingFiles, setLoadingFiles] = useState(true)
   const [pageError, setPageError] = useState('')
 
-  // upload
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploadStep, setUploadStep] = useState<UploadStep>('idle')
   const [pending, setPending] = useState<PendingUpload | null>(null)
@@ -62,36 +52,30 @@ export default function SubjectDetail() {
   const [uploadPublic, setUploadPublic] = useState(false)
   const [uploadError, setUploadError] = useState('')
 
-  // delete modal
   const [deleteTarget, setDeleteTarget] = useState<FileRecord | null>(null)
   const [deleting, setDeleting] = useState(false)
 
-  // rename
   const [rename, setRename] = useState<RenameState | null>(null)
   const [renameSaving, setRenameSaving] = useState(false)
 
-  // visibility toggle loading set
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set())
 
   const isOwner = !!user && subject?.teacherUsername === user.username
 
-  // ─── load subject if not passed via state ──────────────────────────────────
   useEffect(() => {
     if (!id) return
     if (subject) {
       setLoadingSubject(false)
       return
     }
-    api
-      .get<Subject>(`/subjects/${id}`, !!user)
-      .then(setSubject)
+    getSubject(id)
+      .then((data) => setSubject(data as SubjectWithTeacher))
       .catch((err: unknown) => {
         setPageError(err instanceof Error ? err.message : 'Disciplina não encontrada.')
       })
       .finally(() => setLoadingSubject(false))
   }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ─── load files ─────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!id) return
     getSubjectFiles(id)
@@ -100,7 +84,6 @@ export default function SubjectDetail() {
       .finally(() => setLoadingFiles(false))
   }, [id])
 
-  // ─── upload flow ────────────────────────────────────────────────────────────
   function onFilesPicked(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -150,7 +133,6 @@ export default function SubjectDetail() {
     setUploadError('')
   }
 
-  // ─── download ────────────────────────────────────────────────────────────────
   async function handleDownload(file: FileRecord) {
     try {
       const url = await getDownloadUrl(file.id)
@@ -160,7 +142,6 @@ export default function SubjectDetail() {
     }
   }
 
-  // ─── visibility toggle ───────────────────────────────────────────────────────
   async function handleToggleVisibility(file: FileRecord) {
     setTogglingIds((s) => new Set(s).add(file.id))
     try {
@@ -177,7 +158,6 @@ export default function SubjectDetail() {
     }
   }
 
-  // ─── rename ──────────────────────────────────────────────────────────────────
   async function saveRename() {
     if (!rename) return
     const trimmed = rename.value.trim()
@@ -194,7 +174,6 @@ export default function SubjectDetail() {
     }
   }
 
-  // ─── delete ──────────────────────────────────────────────────────────────────
   async function handleDeleteConfirm() {
     if (!deleteTarget) return
     setDeleting(true)
@@ -209,7 +188,6 @@ export default function SubjectDetail() {
     }
   }
 
-  // ─── render ──────────────────────────────────────────────────────────────────
   if (loadingSubject) {
     return (
       <AppLayout>
@@ -302,7 +280,6 @@ export default function SubjectDetail() {
 
             {uploadStep === 'idle' && (
               <div className="space-y-md">
-                {/* Visibility for upload */}
                 <div className="flex gap-sm">
                   {[
                     { value: false, icon: 'lock', label: 'Privado' },
@@ -327,7 +304,6 @@ export default function SubjectDetail() {
                   })}
                 </div>
 
-                {/* Drop zone */}
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
@@ -343,12 +319,7 @@ export default function SubjectDetail() {
                     Clique para selecionar um arquivo
                   </p>
                 </button>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  className="hidden"
-                  onChange={onFilesPicked}
-                />
+                <input ref={fileInputRef} type="file" className="hidden" onChange={onFilesPicked} />
               </div>
             )}
 
@@ -367,7 +338,6 @@ export default function SubjectDetail() {
                   </div>
                 </div>
 
-                {/* Visibility for this file */}
                 <div className="flex gap-sm">
                   {[
                     { value: false, icon: 'lock', label: 'Privado' },
@@ -464,9 +434,7 @@ export default function SubjectDetail() {
             <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>folder_open</span>
             Arquivos
             {!loadingFiles && (
-              <span className="text-label-sm text-on-surface-variant font-normal">
-                ({files.length})
-              </span>
+              <span className="text-label-sm text-on-surface-variant font-normal">({files.length})</span>
             )}
           </h2>
 
@@ -491,7 +459,6 @@ export default function SubjectDetail() {
                   key={file.id}
                   className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-md hover:bg-surface-container-low transition-colors"
                 >
-                  {/* Icon */}
                   <span
                     className="material-symbols-outlined text-primary flex-shrink-0"
                     style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}
@@ -499,7 +466,6 @@ export default function SubjectDetail() {
                     {getMimeIcon(file.mimeType)}
                   </span>
 
-                  {/* Name + meta */}
                   <div className="flex-1 min-w-0">
                     {rename?.id === file.id ? (
                       <div className="flex items-center gap-sm">
@@ -535,11 +501,7 @@ export default function SubjectDetail() {
                       <span className="text-label-sm text-on-surface-variant">{formatFileSize(file.size)}</span>
                       <span className="text-outline">·</span>
                       <span className="text-label-sm text-on-surface-variant">{formatDate(file.createdAt)}</span>
-                      <span className={`text-label-sm px-xs rounded ${
-                        file.isPublic
-                          ? 'text-primary'
-                          : 'text-on-surface-variant'
-                      }`}>
+                      <span className={`text-label-sm px-xs rounded ${file.isPublic ? 'text-primary' : 'text-on-surface-variant'}`}>
                         <span className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>
                           {file.isPublic ? 'public' : 'lock'}
                         </span>
@@ -548,9 +510,7 @@ export default function SubjectDetail() {
                     </div>
                   </div>
 
-                  {/* Actions */}
                   <div className="flex items-center gap-xs flex-shrink-0">
-                    {/* Download */}
                     <button
                       onClick={() => handleDownload(file)}
                       title="Baixar arquivo"
@@ -559,10 +519,8 @@ export default function SubjectDetail() {
                       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
                     </button>
 
-                    {/* Owner-only actions */}
                     {isOwner && (
                       <>
-                        {/* Toggle visibility */}
                         <button
                           onClick={() => handleToggleVisibility(file)}
                           disabled={togglingIds.has(file.id)}
@@ -574,7 +532,6 @@ export default function SubjectDetail() {
                           </span>
                         </button>
 
-                        {/* Rename */}
                         <button
                           onClick={() => setRename({ id: file.id, value: file.originalName })}
                           title="Renomear"
@@ -583,7 +540,6 @@ export default function SubjectDetail() {
                           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
                         </button>
 
-                        {/* Delete */}
                         <button
                           onClick={() => setDeleteTarget(file)}
                           title="Excluir"
