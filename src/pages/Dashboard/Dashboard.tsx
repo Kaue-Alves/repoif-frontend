@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { api } from '../../api/client'
+import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
 import { useAuth } from '../../contexts/AuthContext'
 
@@ -18,7 +19,10 @@ export default function Dashboard() {
   const [subjects, setSubjects] = useState<Subject[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  // delete modal
+  const [deleteTarget, setDeleteTarget] = useState<Subject | null>(null)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     fetchSubjects()
@@ -37,16 +41,17 @@ export default function Dashboard() {
     }
   }
 
-  async function handleDelete(id: string, name: string) {
-    if (!confirm(`Excluir a disciplina "${name}"? Esta ação não pode ser desfeita.`)) return
-    setDeletingId(id)
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return
+    setDeleting(true)
     try {
-      await api.delete(`/subjects/${id}`)
-      setSubjects((prev) => prev.filter((s) => s.id !== id))
+      await api.delete(`/subjects/${deleteTarget.id}`)
+      setSubjects((prev) => prev.filter((s) => s.id !== deleteTarget.id))
+      setDeleteTarget(null)
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erro ao excluir disciplina.')
     } finally {
-      setDeletingId(null)
+      setDeleting(false)
     }
   }
 
@@ -121,14 +126,24 @@ export default function Dashboard() {
             <SubjectCard
               key={subject.id}
               subject={subject}
-              deleting={deletingId === subject.id}
               onEdit={() => navigate(`/subjects/${subject.id}/edit`)}
-              onDelete={() => handleDelete(subject.id, subject.name)}
-              onViewProfile={() => navigate(`/profile/${user?.username}`)}
+              onDelete={() => setDeleteTarget(subject)}
+              username={user?.username ?? ''}
             />
           ))}
         </div>
       )}
+
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Excluir disciplina?"
+        description={`"${deleteTarget?.name}" e todos os seus arquivos serão removidos permanentemente.`}
+        confirmLabel="Excluir"
+        danger
+        loading={deleting}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setDeleteTarget(null)}
+      />
     </AppLayout>
   )
 }
@@ -137,13 +152,12 @@ export default function Dashboard() {
 
 interface SubjectCardProps {
   subject: Subject
-  deleting: boolean
+  username: string
   onEdit: () => void
   onDelete: () => void
-  onViewProfile: () => void
 }
 
-function SubjectCard({ subject, deleting, onEdit, onDelete, onViewProfile }: SubjectCardProps) {
+function SubjectCard({ subject, username, onEdit, onDelete }: SubjectCardProps) {
   return (
     <article className="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden">
       {/* Color accent bar */}
@@ -187,17 +201,15 @@ function SubjectCard({ subject, deleting, onEdit, onDelete, onViewProfile }: Sub
         </p>
       )}
 
-      <div className="flex gap-sm mt-auto pt-md border-t border-outline-variant pl-xs">
-        {subject.isPublic && (
-          <button
-            onClick={onViewProfile}
-            className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
-            title="Ver no perfil público"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>open_in_new</span>
-            Ver
-          </button>
-        )}
+      <div className="flex flex-wrap gap-sm mt-auto pt-md border-t border-outline-variant pl-xs">
+        <Link
+          to={`/subjects/${subject.id}`}
+          state={{ subject: { ...subject, teacherUsername: username } }}
+          className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
+          Arquivos
+        </Link>
         <button
           onClick={onEdit}
           className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-primary hover:bg-primary-container/20 transition-colors"
@@ -207,17 +219,9 @@ function SubjectCard({ subject, deleting, onEdit, onDelete, onViewProfile }: Sub
         </button>
         <button
           onClick={onDelete}
-          disabled={deleting}
-          className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-secondary hover:bg-error-container/30 transition-colors disabled:opacity-50 ml-auto"
+          className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-secondary hover:bg-error-container/30 transition-colors ml-auto"
         >
-          {deleting ? (
-            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
-          ) : (
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
-          )}
+          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
           Excluir
         </button>
       </div>

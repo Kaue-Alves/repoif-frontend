@@ -153,7 +153,7 @@ export default function Profile() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
                 {profile.subjects.map((subject) => (
-                  <PublicSubjectCard key={subject.id} subject={subject} isOwner={isOwner} />
+                  <PublicSubjectCard key={subject.id} subject={subject} isOwner={isOwner} ownerUsername={profile.username} />
                 ))}
               </div>
             )}
@@ -169,9 +169,11 @@ export default function Profile() {
 function PublicSubjectCard({
   subject,
   isOwner,
+  ownerUsername,
 }: {
   subject: Subject
   isOwner: boolean
+  ownerUsername: string
 }) {
   return (
     <article className="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden">
@@ -205,8 +207,16 @@ function PublicSubjectCard({
         </p>
       )}
 
-      {isOwner && (
-        <div className="flex gap-sm mt-lg pt-md border-t border-outline-variant pl-xs">
+      <div className="flex flex-wrap gap-sm mt-lg pt-md border-t border-outline-variant pl-xs">
+        <Link
+          to={`/subjects/${subject.id}`}
+          state={{ subject: { ...subject, teacherUsername: ownerUsername } }}
+          className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+        >
+          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
+          Ver arquivos
+        </Link>
+        {isOwner && (
           <Link
             to={`/subjects/${subject.id}/edit`}
             className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-primary hover:bg-primary-container/20 transition-colors"
@@ -214,8 +224,8 @@ function PublicSubjectCard({
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
             Editar
           </Link>
-        </div>
-      )}
+        )}
+      </div>
     </article>
   )
 }

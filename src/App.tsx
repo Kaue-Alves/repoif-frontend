@@ -8,6 +8,7 @@ import Login from './pages/Login/Login'
 import Profile from './pages/Profile/Profile'
 import Register from './pages/Register/Register'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
+import SubjectDetail from './pages/Subjects/SubjectDetail'
 import SubjectEdit from './pages/Subjects/SubjectEdit'
 import SubjectNew from './pages/Subjects/SubjectNew'
 import VerifyEmail from './pages/VerifyEmail/VerifyEmail'
@@ -30,6 +31,7 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/profile/:username" element={<Profile />} />
+      <Route path="/subjects/:id" element={<SubjectDetail />} />
 
       {/* Protected (any logged-in user) */}
       <Route element={<ProtectedRoute />}>
