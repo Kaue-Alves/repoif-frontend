@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import AppLayout from '../../components/layouts/AppLayout'
-import { getSubject, updateSubject, type Subject } from './subjects.service'
+import { getSubject, updateSubject } from './subjects.service'
 
 export default function SubjectEdit() {
   const { id } = useParams<{ id: string }>()
