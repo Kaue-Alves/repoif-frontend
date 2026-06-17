@@ -8,6 +8,7 @@ import Login from './pages/Login/Login'
 import Profile from './pages/Profile/Profile'
 import Register from './pages/Register/Register'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
+import Search from './pages/Search/Search'
 import SubjectDetail from './pages/Subjects/SubjectDetail'
 import SubjectEdit from './pages/Subjects/SubjectEdit'
 import SubjectNew from './pages/Subjects/SubjectNew'
@@ -15,7 +16,7 @@ import VerifyEmail from './pages/VerifyEmail/VerifyEmail'
 
 function RootRedirect() {
   const { user, isAuthenticated } = useAuth()
-  if (!isAuthenticated) return <Navigate to="/login" replace />
+  if (!isAuthenticated) return <Navigate to="/search" replace />
   if (user?.role === 'TEACHER') return <Navigate to="/dashboard" replace />
   return <Navigate to={`/profile/${user?.username}`} replace />
 }
@@ -25,6 +26,7 @@ function App() {
     <Routes>
       {/* Public */}
       <Route path="/" element={<RootRedirect />} />
+      <Route path="/search" element={<Search />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify-email" element={<VerifyEmail />} />

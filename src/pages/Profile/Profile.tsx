@@ -1,25 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { api } from '../../api/client'
+import { getUserProfile, type Subject, type UserProfile } from '../../api/users'
 import AppLayout from '../../components/layouts/AppLayout'
 import { useAuth } from '../../contexts/AuthContext'
 
-interface Subject {
-  id: string
-  name: string
-  description?: string
-  isPublic: boolean
-}
-
-interface UserProfile {
-  username: string
-  role: 'TEACHER' | 'STUDENT'
-  subjects: Subject[]
-}
-
 export default function Profile() {
   const { username } = useParams<{ username: string }>()
-  const { user: authUser, token } = useAuth()
+  const { user: authUser } = useAuth()
 
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
@@ -31,22 +18,11 @@ export default function Profile() {
     if (!username) return
     setLoading(true)
     setError('')
-
-    const headers: Record<string, string> = {}
-    if (token) headers['Authorization'] = `Bearer ${token}`
-
-    fetch(`http://localhost:3001/users/${username}`, { headers })
-      .then(async (res) => {
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({})) as { message?: string }
-          throw new Error(data.message ?? `Erro ${res.status}`)
-        }
-        return res.json() as Promise<UserProfile>
-      })
+    getUserProfile(username)
       .then(setProfile)
       .catch((err: unknown) => setError(err instanceof Error ? err.message : 'Erro ao carregar perfil.'))
       .finally(() => setLoading(false))
-  }, [username, token])
+  }, [username])
 
   return (
     <AppLayout>
