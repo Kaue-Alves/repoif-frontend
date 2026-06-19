@@ -3,16 +3,16 @@
 @tailwind utilities;
 
 :root {
-  /* Paleta IFPI */
-  --ifpi-green: #32a041;
-  --ifpi-red: #e30613;
+  /* Paleta base */
+  --color-primary: #1a3fff;
+  --color-primary-dim: #bac3ff;
 
-  /* Neutros (limpo/acadêmico) */
-  --bg: #f7f7f8;
+  /* Neutros */
+  --bg: #f9f9ff;
   --surface: #ffffff;
-  --text: #0f172a;
-  --muted: #475569;
-  --border: #e2e8f0;
+  --text: #1a1b22;
+  --muted: #46464f;
+  --border: #c6c5d0;
 
   --radius-lg: 16px;
   --radius-md: 12px;
