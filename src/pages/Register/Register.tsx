@@ -128,7 +128,7 @@ export default function Register() {
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Ex: joao@ifpi.edu.br"
+            placeholder="Ex: joao@email.com"
             autoComplete="email"
             required
             className={inputClass}
