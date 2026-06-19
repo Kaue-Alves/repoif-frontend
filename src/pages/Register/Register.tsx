@@ -101,6 +101,12 @@ export default function Register() {
               )
             })}
           </div>
+          <div className="mt-sm flex items-start gap-xs bg-surface-container rounded-lg px-md py-sm text-body-sm text-on-surface-variant">
+            <span className="material-symbols-outlined flex-shrink-0 mt-[1px]" style={{ fontSize: 16 }}>info</span>
+            {role === 'STUDENT'
+              ? 'Acesse conteúdos de professores e faça download dos arquivos disponibilizados.'
+              : 'Crie disciplinas e publique arquivos para que alunos possam visualizar e baixar.'}
+          </div>
         </div>
 
         <Field label="Username">

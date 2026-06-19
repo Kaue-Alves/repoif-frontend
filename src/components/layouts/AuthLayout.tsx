@@ -22,7 +22,7 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
               </span>
             </div>
             <span className="text-headline-sm text-primary font-black tracking-tight">RepoIF</span>
-            <span className="text-label-sm text-on-surface-variant">IFPI — Campus Picos</span>
+            <span className="text-label-sm text-on-surface-variant">Organize. Compartilhe. Estude.</span>
           </Link>
         </div>
 

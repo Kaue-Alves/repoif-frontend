@@ -60,7 +60,7 @@ export default function Login() {
             type="text"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
-            placeholder="Ex: joaosilva ou joao@ifpi.edu.br"
+            placeholder="Ex: joaosilva ou joao@email.com"
             autoComplete="username"
             required
             className={inputClass}

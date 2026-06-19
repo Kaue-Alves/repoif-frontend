@@ -111,7 +111,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </main>
 
       <footer className="border-t border-outline-variant py-md px-gutter text-center text-label-sm text-on-surface-variant">
-        RepoIF — IFPI Campus Picos
+        RepoIF: Organize. Compartilhe. Estude. — Desenvolvido com ☕ por Kauê Alves S, 2026. 
       </footer>
     </div>
   )
