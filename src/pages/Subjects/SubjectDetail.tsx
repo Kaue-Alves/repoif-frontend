@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
+import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
 import {
   type FileRecord,
@@ -133,12 +134,31 @@ export default function SubjectDetail() {
     setUploadError('')
   }
 
-  async function handleDownload(file: FileRecord) {
+  async function handleView(file: FileRecord) {
     try {
       const url = await getDownloadUrl(file.id)
       window.open(url, '_blank', 'noopener,noreferrer')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao obter link de download.')
+      alert(err instanceof Error ? err.message : 'Erro ao abrir o arquivo.')
+    }
+  }
+
+  async function handleDownload(file: FileRecord) {
+    try {
+      const url = await getDownloadUrl(file.id)
+      const res = await fetch(url)
+      if (!res.ok) throw new Error('Falha ao baixar o arquivo.')
+      const blob = await res.blob()
+      const objectUrl = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = objectUrl
+      a.download = file.originalName
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      URL.revokeObjectURL(objectUrl)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Erro ao baixar o arquivo.')
     }
   }
 
@@ -192,10 +212,7 @@ export default function SubjectDetail() {
     return (
       <AppLayout>
         <div className="flex items-center justify-center py-xl">
-          <svg className="animate-spin h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-          </svg>
+          <Spinner className="h-8 w-8 text-primary" />
         </div>
       </AppLayout>
     )
@@ -440,10 +457,7 @@ export default function SubjectDetail() {
 
           {loadingFiles ? (
             <div className="flex justify-center py-xl">
-              <svg className="animate-spin h-6 w-6 text-primary" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-              </svg>
+              <Spinner className="h-6 w-6 text-primary" />
             </div>
           ) : files.length === 0 ? (
             <div className="flex flex-col items-center gap-md py-xl text-center border-2 border-dashed border-outline-variant rounded-xl">
@@ -511,6 +525,14 @@ export default function SubjectDetail() {
                   </div>
 
                   <div className="flex items-center gap-xs flex-shrink-0">
+                    <button
+                      onClick={() => handleView(file)}
+                      title="Visualizar arquivo"
+                      className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>visibility</span>
+                    </button>
+
                     <button
                       onClick={() => handleDownload(file)}
                       title="Baixar arquivo"
