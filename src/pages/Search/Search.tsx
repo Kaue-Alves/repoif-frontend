@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { searchTeachers, type TeacherResult } from './search.service'
 import AppLayout from '../../components/layouts/AppLayout'
+import Spinner from '../../components/Spinner'
 
 export default function Search() {
   const [query, setQuery] = useState('')
@@ -57,14 +58,9 @@ export default function Search() {
             className="w-full pl-[44px] pr-[44px] py-md bg-surface-container-lowest border border-outline-variant rounded-xl text-body-lg text-on-surface placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm"
           />
           {loading && (
-            <svg
-              className="animate-spin h-5 w-5 absolute right-md top-1/2 -translate-y-1/2 text-primary"
-              viewBox="0 0 24 24"
-              fill="none"
-            >
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-            </svg>
+            <span className="absolute right-md top-1/2 -translate-y-1/2">
+              <Spinner className="h-5 w-5 text-primary" />
+            </span>
           )}
         </div>
 

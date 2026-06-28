@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import AuthLayout from '../../components/layouts/AuthLayout'
+import Spinner from '../../components/Spinner'
 import { verifyEmail } from './verifyEmail.service'
 
 type Status = 'loading' | 'success' | 'error'
@@ -32,10 +33,7 @@ export default function VerifyEmail() {
         {status === 'loading' && (
           <>
             <div className="w-16 h-16 rounded-full bg-surface-container-highest flex items-center justify-center mx-auto">
-              <svg className="animate-spin h-8 w-8 text-primary" viewBox="0 0 24 24" fill="none">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-              </svg>
+              <Spinner className="h-8 w-8 text-primary" />
             </div>
             <p className="text-body-md text-on-surface-variant">Verificando seu email...</p>
           </>

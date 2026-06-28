@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
+import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
 import { deleteSubject, getSubjects, type Subject } from './dashboard.service'
 
@@ -70,10 +71,7 @@ export default function Dashboard() {
       {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-xl gap-md text-on-surface-variant">
-          <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
-          </svg>
+          <Spinner className="h-5 w-5" />
           <span className="text-body-md">Carregando disciplinas...</span>
         </div>
       )}
