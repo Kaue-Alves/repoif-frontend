@@ -5,6 +5,7 @@ import { useAuth } from './contexts/AuthContext'
 import Dashboard from './pages/Dashboard/Dashboard'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import Login from './pages/Login/Login'
+import NotFound from './pages/NotFound/NotFound'
 import Profile from './pages/Profile/Profile'
 import Register from './pages/Register/Register'
 import ResetPassword from './pages/ResetPassword/ResetPassword'
@@ -45,7 +46,7 @@ function App() {
         </Route>
       </Route>
 
-      <Route path="*" element={<RootRedirect />} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }
