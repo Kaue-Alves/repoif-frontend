@@ -111,10 +111,12 @@ export default function Profile() {
                 </span>
                 <p className="text-body-md text-on-surface-variant">
                   {isOwner
-                    ? 'Você ainda não criou nenhuma disciplina.'
+                    ? profile.role === 'TEACHER'
+                      ? 'Você ainda não criou nenhuma disciplina.'
+                      : 'Você ainda não tem disciplinas públicas.'
                     : 'Este professor não tem disciplinas públicas.'}
                 </p>
-                {isOwner && (
+                {isOwner && profile.role === 'TEACHER' && (
                   <Link
                     to="/subjects/new"
                     className="inline-flex items-center gap-sm mt-lg bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
