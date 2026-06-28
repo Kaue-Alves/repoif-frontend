@@ -22,16 +22,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
       <header className="sticky top-0 z-50 bg-surface border-b border-outline-variant shadow-sm">
         <div className="max-w-[1280px] mx-auto h-16 px-gutter flex items-center justify-between">
           {/* Logo */}
-          <Link to={logoHref} className="flex items-center gap-sm">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <span
-                className="material-symbols-outlined text-on-primary"
-                style={{ fontSize: 18, fontVariationSettings: "'FILL' 1" }}
-              >
-                school
-              </span>
-            </div>
-            <span className="text-headline-sm text-primary font-black tracking-tight">RepoIF</span>
+          <Link to={logoHref} className="flex items-center">
+            <img src="/images/repoif-lockup-blue.svg" alt="RepoIF" className="h-8 w-auto" />
           </Link>
 
           {/* Nav links */}

@@ -13,14 +13,11 @@ export default function AuthLayout({ children, title, subtitle }: AuthLayoutProp
         {/* Logo */}
         <div className="text-center mb-xl">
           <Link to="/" className="inline-flex flex-col items-center gap-xs">
-            <div className="w-14 h-14 bg-primary rounded-xl flex items-center justify-center shadow-md">
-              <span
-                className="material-symbols-outlined text-on-primary"
-                style={{ fontSize: 32, fontVariationSettings: "'FILL' 1" }}
-              >
-                school
-              </span>
-            </div>
+            <img
+              src="/images/repoif-app-icon.svg"
+              alt="RepoIF"
+              className="w-14 h-14 rounded-xl shadow-md"
+            />
             <span className="text-headline-sm text-primary font-black tracking-tight">RepoIF</span>
             <span className="text-label-sm text-on-surface-variant">Organize. Compartilhe. Estude.</span>
           </Link>
