@@ -5,6 +5,11 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Cores de ação dos ícones (contrastantes entre si)
+        'action-view': '#2563eb',      // azul
+        'action-download': '#16a34a',  // verde
+        'action-visibility': '#ea580c', // laranja
+        'action-rename': '#0891b2',    // ciano
         'surface-container-high': '#e5e5ef',
         error: '#ba1a1a',
         'surface-tint': '#1a3fff',

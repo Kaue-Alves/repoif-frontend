@@ -570,7 +570,7 @@ export default function SubjectDetail() {
                     <button
                       onClick={() => handleView(file)}
                       title="Visualizar arquivo"
-                      className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
+                      className="w-9 h-9 flex items-center justify-center rounded-lg text-action-view hover:bg-surface-container-high transition-all"
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>visibility</span>
                     </button>
@@ -578,7 +578,7 @@ export default function SubjectDetail() {
                     <button
                       onClick={() => handleDownload(file)}
                       title="Baixar arquivo"
-                      className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
+                      className="w-9 h-9 flex items-center justify-center rounded-lg text-action-download hover:bg-surface-container-high transition-all"
                     >
                       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
                     </button>
@@ -597,7 +597,7 @@ export default function SubjectDetail() {
                           onClick={() => handleToggleVisibility(file)}
                           disabled={togglingIds.has(file.id)}
                           title={file.isPublic ? 'Tornar privado' : 'Tornar público'}
-                          className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all disabled:opacity-40"
+                          className="w-9 h-9 flex items-center justify-center rounded-lg text-action-visibility hover:bg-surface-container-high transition-all disabled:opacity-40"
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
                             {file.isPublic ? 'lock' : 'public'}
@@ -607,7 +607,7 @@ export default function SubjectDetail() {
                         <button
                           onClick={() => setRename({ id: file.id, value: file.originalName })}
                           title="Renomear"
-                          className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all"
+                          className="w-9 h-9 flex items-center justify-center rounded-lg text-action-rename hover:bg-surface-container-high transition-all"
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
                         </button>
@@ -615,7 +615,7 @@ export default function SubjectDetail() {
                         <button
                           onClick={() => setDeleteTarget(file)}
                           title="Excluir"
-                          className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-all"
+                          className="w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all"
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
                         </button>
