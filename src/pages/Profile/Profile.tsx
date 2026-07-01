@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { getUserProfile, type Subject, type UserProfile } from './profile.service'
 import AppLayout from '../../components/layouts/AppLayout'
 import Spinner from '../../components/Spinner'
+import TeacherDirectory from '../../components/TeacherDirectory'
 import { useAuth } from '../../contexts/AuthContext'
 
 export default function Profile() {
@@ -77,11 +78,13 @@ export default function Profile() {
                 </span>
               </div>
 
-              <p className="text-body-md text-on-surface-variant">
-                {profile.subjects.length}{' '}
-                {profile.subjects.length === 1 ? 'disciplina pública' : 'disciplinas públicas'}
-                {isOwner && ' (você pode ver as privadas também)'}
-              </p>
+              {profile.role === 'TEACHER' && (
+                <p className="text-body-md text-on-surface-variant">
+                  {profile.subjects.length}{' '}
+                  {profile.subjects.length === 1 ? 'disciplina pública' : 'disciplinas públicas'}
+                  {isOwner && ' (você pode ver as privadas também)'}
+                </p>
+              )}
             </div>
 
             {isOwner && profile.role === 'TEACHER' && (
@@ -95,7 +98,13 @@ export default function Profile() {
             )}
           </div>
 
-          {/* Subjects */}
+          {/* Student owner: directory of teachers instead of an empty subjects section */}
+          {isOwner && profile.role === 'STUDENT' ? (
+            <div>
+              <h2 className="text-headline-sm text-on-surface mb-lg">Encontre professores</h2>
+              <TeacherDirectory />
+            </div>
+          ) : (
           <div>
             <h2 className="text-headline-sm text-on-surface mb-lg">
               {profile.role === 'TEACHER' ? 'Disciplinas' : 'Informações'}
@@ -134,6 +143,7 @@ export default function Profile() {
               </div>
             )}
           </div>
+          )}
         </>
       )}
     </AppLayout>

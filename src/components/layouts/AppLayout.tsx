@@ -28,7 +28,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const navItems: NavItem[] = [
     { to: '/search', label: 'Buscar', icon: 'search' },
     ...(user?.role === 'TEACHER' ? [{ to: '/dashboard', label: 'Disciplinas', icon: 'dashboard' }] : []),
-    ...(user ? [{ to: `/profile/${user.username}`, label: 'Meu Perfil', icon: 'person' }] : []),
+    ...(user
+      ? [
+          {
+            to: `/profile/${user.username}`,
+            label: user.role === 'TEACHER' ? 'Meu Perfil' : 'Minhas Disciplinas',
+            icon: user.role === 'TEACHER' ? 'person' : 'menu_book',
+          },
+        ]
+      : []),
   ]
 
   return (
