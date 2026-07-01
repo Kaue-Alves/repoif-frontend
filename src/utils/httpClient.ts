@@ -20,7 +20,7 @@ export function clearToken() {
   localStorage.removeItem(EXPIRY_KEY)
 }
 
-const baseURL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:3001'
+const baseURL: string = import.meta.env.VITE_API_URL ?? 'http://localhost:3000'
 
 if (!baseURL.startsWith('http://') && !baseURL.startsWith('https://')) {
   throw new Error(`VITE_API_URL deve ser uma URL absoluta (ex: https://api.exemplo.com). Valor atual: "${baseURL}"`)
