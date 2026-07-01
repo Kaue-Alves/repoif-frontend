@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
+import QrCodeModal from '../../components/QrCodeModal'
 import AppLayout from '../../components/layouts/AppLayout'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
@@ -60,6 +61,12 @@ export default function SubjectDetail() {
   const [renameSaving, setRenameSaving] = useState(false)
 
   const [togglingIds, setTogglingIds] = useState<Set<string>>(new Set())
+
+  const [qrTarget, setQrTarget] = useState<FileRecord | null>(null)
+  const [qrUrl, setQrUrl] = useState<string | null>(null)
+  const [qrLoading, setQrLoading] = useState(false)
+  const [qrError, setQrError] = useState('')
+  const [qrConfirm, setQrConfirm] = useState<FileRecord | null>(null)
 
   const isOwner = !!user && subject?.teacherUsername === user.username
 
@@ -141,6 +148,41 @@ export default function SubjectDetail() {
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erro ao abrir o arquivo.')
     }
+  }
+
+  async function openQr(file: FileRecord) {
+    setQrTarget(file)
+    setQrUrl(null)
+    setQrError('')
+    setQrLoading(true)
+    try {
+      const url = await getDownloadUrl(file.id)
+      setQrUrl(url)
+    } catch (err) {
+      setQrError(err instanceof Error ? err.message : 'Erro ao gerar o QR code.')
+    } finally {
+      setQrLoading(false)
+    }
+  }
+
+  function handleShowQr(file: FileRecord) {
+    if (file.isPublic) {
+      openQr(file)
+    } else {
+      setQrConfirm(file)
+    }
+  }
+
+  function confirmQrShare() {
+    const file = qrConfirm
+    setQrConfirm(null)
+    if (file) openQr(file)
+  }
+
+  function closeQr() {
+    setQrTarget(null)
+    setQrUrl(null)
+    setQrError('')
   }
 
   async function handleDownload(file: FileRecord) {
@@ -541,6 +583,14 @@ export default function SubjectDetail() {
                       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
                     </button>
 
+                    <button
+                      onClick={() => handleShowQr(file)}
+                      title="Compartilhar via QR code"
+                      className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface hover:bg-surface-container-high transition-all"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>qr_code_2</span>
+                    </button>
+
                     {isOwner && (
                       <>
                         <button
@@ -588,6 +638,24 @@ export default function SubjectDetail() {
         loading={deleting}
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteTarget(null)}
+      />
+
+      <ConfirmModal
+        open={!!qrConfirm}
+        title="Compartilhar arquivo privado?"
+        description={`"${qrConfirm?.originalName}" é privado. Qualquer pessoa que escanear o QR code poderá acessá-lo. Deseja continuar?`}
+        confirmLabel="Compartilhar"
+        onConfirm={confirmQrShare}
+        onCancel={() => setQrConfirm(null)}
+      />
+
+      <QrCodeModal
+        open={!!qrTarget}
+        fileName={qrTarget?.originalName ?? ''}
+        url={qrUrl}
+        loading={qrLoading}
+        error={qrError}
+        onClose={closeQr}
       />
     </AppLayout>
   )
