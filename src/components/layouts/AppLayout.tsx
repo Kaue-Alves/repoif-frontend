@@ -23,12 +23,19 @@ export default function AppLayout({ children }: AppLayoutProps) {
     navigate('/login')
   }
 
-  const logoHref = !user ? '/search' : user.role === 'TEACHER' ? '/dashboard' : `/profile/${user.username}`
+  const logoHref = !user
+    ? '/search'
+    : user.role === 'ADMIN'
+      ? '/admin'
+      : user.role === 'TEACHER'
+        ? '/dashboard'
+        : `/profile/${user.username}`
 
   const navItems: NavItem[] = [
     { to: '/search', label: 'Buscar', icon: 'search' },
+    ...(user?.role === 'ADMIN' ? [{ to: '/admin', label: 'Admin', icon: 'admin_panel_settings' }] : []),
     ...(user?.role === 'TEACHER' ? [{ to: '/dashboard', label: 'Disciplinas', icon: 'dashboard' }] : []),
-    ...(user
+    ...(user && user.role !== 'ADMIN'
       ? [
           {
             to: `/profile/${user.username}`,
@@ -38,6 +45,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
         ]
       : []),
   ]
+
+  const roleLabel = user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'TEACHER' ? 'Professor' : 'Aluno'
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -72,7 +81,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                     @{user.username}
                   </span>
                   <span className="hidden sm:block text-label-sm text-on-surface-variant">
-                    {user.role === 'TEACHER' ? 'Professor' : 'Aluno'}
+                    {roleLabel}
                   </span>
                 </div>
                 <div className="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center">
@@ -163,7 +172,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
       </main>
 
       <footer className="border-t border-outline-variant py-md px-gutter text-center text-label-sm text-on-surface-variant">
-        RepoIF: Organize. Compartilhe. Estude. — Desenvolvido com ☕ por Kauê Alves S, 2026.
+        RepoIF: Organize. Compartilhe. Estude. - Desenvolvido com ☕ por Kauê Alves S, 2026.
       </footer>
     </div>
   )

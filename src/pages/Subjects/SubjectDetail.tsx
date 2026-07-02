@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import QrCodeModal from '../../components/QrCodeModal'
+import ReportModal from '../../components/ReportModal'
 import AppLayout from '../../components/layouts/AppLayout'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
@@ -67,6 +68,8 @@ export default function SubjectDetail() {
   const [qrLoading, setQrLoading] = useState(false)
   const [qrError, setQrError] = useState('')
   const [qrConfirm, setQrConfirm] = useState<FileRecord | null>(null)
+
+  const [reportTarget, setReportTarget] = useState<FileRecord | null>(null)
 
   const isOwner = !!user && subject?.teacherUsername === user.username
 
@@ -591,6 +594,16 @@ export default function SubjectDetail() {
                       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>qr_code_2</span>
                     </button>
 
+                    {user && !isOwner && (
+                      <button
+                        onClick={() => setReportTarget(file)}
+                        title="Denunciar arquivo"
+                        className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-all"
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>flag</span>
+                      </button>
+                    )}
+
                     {isOwner && (
                       <>
                         <button
@@ -656,6 +669,14 @@ export default function SubjectDetail() {
         loading={qrLoading}
         error={qrError}
         onClose={closeQr}
+      />
+
+      <ReportModal
+        open={!!reportTarget}
+        targetType="FILE"
+        targetFileId={reportTarget?.id}
+        targetLabel={reportTarget?.originalName ?? ''}
+        onClose={() => setReportTarget(null)}
       />
     </AppLayout>
   )

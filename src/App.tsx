@@ -1,7 +1,12 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import AdminRoute from './components/AdminRoute'
 import ProtectedRoute from './components/ProtectedRoute'
 import TeacherRoute from './components/TeacherRoute'
 import { useAuth } from './contexts/AuthContext'
+import AdminDashboard from './pages/Admin/AdminDashboard'
+import AdminFiles from './pages/Admin/AdminFiles'
+import AdminReports from './pages/Admin/AdminReports'
+import AdminUsers from './pages/Admin/AdminUsers'
 import Dashboard from './pages/Dashboard/Dashboard'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import Login from './pages/Login/Login'
@@ -18,6 +23,7 @@ import VerifyEmail from './pages/VerifyEmail/VerifyEmail'
 function RootRedirect() {
   const { user, isAuthenticated } = useAuth()
   if (!isAuthenticated) return <Navigate to="/search" replace />
+  if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />
   if (user?.role === 'TEACHER') return <Navigate to="/dashboard" replace />
   return <Navigate to={`/profile/${user?.username}`} replace />
 }
@@ -43,6 +49,14 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/subjects/new" element={<SubjectNew />} />
           <Route path="/subjects/:id/edit" element={<SubjectEdit />} />
+        </Route>
+
+        {/* Admin only */}
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin/users" element={<AdminUsers />} />
+          <Route path="/admin/files" element={<AdminFiles />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
         </Route>
       </Route>
 

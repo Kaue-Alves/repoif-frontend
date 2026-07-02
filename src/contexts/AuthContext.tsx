@@ -8,7 +8,7 @@ import {
 } from 'react'
 import { clearToken, getStoredToken, storeToken } from '../utils/httpClient'
 
-export type UserRole = 'TEACHER' | 'STUDENT'
+export type UserRole = 'ADMIN' | 'TEACHER' | 'STUDENT'
 
 export interface AuthUser {
   sub: string

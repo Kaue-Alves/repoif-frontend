@@ -8,6 +8,7 @@ export interface Subject {
 }
 
 export interface UserProfile {
+  id: string
   username: string
   role: 'TEACHER' | 'STUDENT'
   subjects: Subject[]

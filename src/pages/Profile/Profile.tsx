@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { getUserProfile, type Subject, type UserProfile } from './profile.service'
 import AppLayout from '../../components/layouts/AppLayout'
+import ReportModal from '../../components/ReportModal'
 import Spinner from '../../components/Spinner'
 import TeacherDirectory from '../../components/TeacherDirectory'
 import { useAuth } from '../../contexts/AuthContext'
@@ -13,8 +14,10 @@ export default function Profile() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [reportOpen, setReportOpen] = useState(false)
 
   const isOwner = authUser?.username === username
+  const canReport = !!authUser && !isOwner
 
   useEffect(() => {
     if (!username) return
@@ -96,6 +99,16 @@ export default function Profile() {
                 Nova Disciplina
               </Link>
             )}
+
+            {canReport && (
+              <button
+                onClick={() => setReportOpen(true)}
+                className="flex items-center gap-sm border border-outline-variant text-on-surface-variant px-lg py-sm rounded-xl text-label-lg font-medium hover:bg-error-container/40 hover:text-on-error-container hover:border-error/40 transition-all self-start"
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>flag</span>
+                Denunciar
+              </button>
+            )}
           </div>
 
           {/* Student owner: directory of teachers instead of an empty subjects section */}
@@ -145,6 +158,16 @@ export default function Profile() {
           </div>
           )}
         </>
+      )}
+
+      {profile && (
+        <ReportModal
+          open={reportOpen}
+          targetType="USER"
+          targetUserId={profile.id}
+          targetLabel={`@${profile.username}`}
+          onClose={() => setReportOpen(false)}
+        />
       )}
     </AppLayout>
   )
