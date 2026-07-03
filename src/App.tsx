@@ -7,6 +7,10 @@ import AdminDashboard from './pages/Admin/AdminDashboard'
 import AdminFiles from './pages/Admin/AdminFiles'
 import AdminReports from './pages/Admin/AdminReports'
 import AdminUsers from './pages/Admin/AdminUsers'
+import AssignmentDetail from './pages/Assignments/AssignmentDetail'
+import ClassroomDetail from './pages/Classrooms/ClassroomDetail'
+import ClassroomList from './pages/Classrooms/ClassroomList'
+import JoinClassroom from './pages/Classrooms/JoinClassroom'
 import Dashboard from './pages/Dashboard/Dashboard'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
 import Login from './pages/Login/Login'
@@ -22,7 +26,7 @@ import VerifyEmail from './pages/VerifyEmail/VerifyEmail'
 
 function RootRedirect() {
   const { user, isAuthenticated } = useAuth()
-  if (!isAuthenticated) return <Navigate to="/search" replace />
+  if (!isAuthenticated) return <Navigate to="/login" replace />
   if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />
   if (user?.role === 'TEACHER') return <Navigate to="/dashboard" replace />
   return <Navigate to={`/profile/${user?.username}`} replace />
@@ -33,17 +37,25 @@ function App() {
     <Routes>
       {/* Public */}
       <Route path="/" element={<RootRedirect />} />
-      <Route path="/search" element={<Search />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/profile/:username" element={<Profile />} />
-      <Route path="/subjects/:id" element={<SubjectDetail />} />
 
       {/* Protected (any logged-in user) */}
       <Route element={<ProtectedRoute />}>
+        {/* Buscar professores e ver perfis exige login */}
+        <Route path="/search" element={<Search />} />
+        <Route path="/profile/:username" element={<Profile />} />
+        <Route path="/subjects/:id" element={<SubjectDetail />} />
+        <Route path="/assignments/:id" element={<AssignmentDetail />} />
+
+        {/* Turmas (professor e aluno) */}
+        <Route path="/classrooms" element={<ClassroomList />} />
+        <Route path="/classrooms/join/:token" element={<JoinClassroom />} />
+        <Route path="/classrooms/:id" element={<ClassroomDetail />} />
+
         {/* Teacher only */}
         <Route element={<TeacherRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />

@@ -35,6 +35,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     { to: '/search', label: 'Buscar', icon: 'search' },
     ...(user?.role === 'ADMIN' ? [{ to: '/admin', label: 'Admin', icon: 'admin_panel_settings' }] : []),
     ...(user?.role === 'TEACHER' ? [{ to: '/dashboard', label: 'Disciplinas', icon: 'dashboard' }] : []),
+    ...(user && user.role !== 'ADMIN' ? [{ to: '/classrooms', label: 'Turmas', icon: 'groups' }] : []),
     ...(user && user.role !== 'ADMIN'
       ? [
           {

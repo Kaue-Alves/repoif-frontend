@@ -2,46 +2,77 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
+import Pagination, { type PageMeta } from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
-import { deleteSubject, getSubjects, type Subject } from './dashboard.service'
+import { deleteSubject, listSubjects, type Subject } from './dashboard.service'
+
+const PAGE_LIMIT = 9
 
 export default function Dashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
   const [subjects, setSubjects] = useState<Subject[]>([])
+  const [meta, setMeta] = useState<PageMeta | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+
+  const [search, setSearch] = useState('')
+  const [activeSearch, setActiveSearch] = useState('')
+  const [page, setPage] = useState(1)
+  const [reloadKey, setReloadKey] = useState(0)
 
   // delete modal
   const [deleteTarget, setDeleteTarget] = useState<Subject | null>(null)
   const [deleting, setDeleting] = useState(false)
 
+  // Debounce da busca: volta para a primeira página ao mudar o termo.
   useEffect(() => {
-    fetchSubjects()
-  }, [])
+    const timer = setTimeout(() => {
+      setActiveSearch(search.trim())
+      setPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [search])
 
-  async function fetchSubjects() {
+  useEffect(() => {
+    let cancelled = false
     setLoading(true)
     setError('')
-    try {
-      const data = await getSubjects()
-      setSubjects(data)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao carregar disciplinas.')
-    } finally {
-      setLoading(false)
+    listSubjects(page, PAGE_LIMIT, activeSearch)
+      .then((res) => {
+        if (cancelled) return
+        setSubjects(res.data)
+        setMeta(res.meta)
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return
+        setSubjects([])
+        setMeta(null)
+        setError(err instanceof Error ? err.message : 'Erro ao carregar disciplinas.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
     }
-  }
+  }, [page, activeSearch, reloadKey])
 
   async function handleDeleteConfirm() {
     if (!deleteTarget) return
     setDeleting(true)
     try {
       await deleteSubject(deleteTarget.id)
-      setSubjects((prev) => prev.filter((s) => s.id !== deleteTarget.id))
+      const wasLastOnPage = subjects.length === 1
       setDeleteTarget(null)
+      // Se a página ficou vazia e não é a primeira, volta uma página; senão recarrega.
+      if (wasLastOnPage && page > 1) {
+        setPage((p) => p - 1)
+      } else {
+        setReloadKey((k) => k + 1)
+      }
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Erro ao excluir disciplina.')
     } finally {
@@ -68,27 +99,19 @@ export default function Dashboard() {
         </Link>
       </div>
 
-      {/* Loading */}
-      {loading && (
-        <div className="flex items-center justify-center py-xl gap-md text-on-surface-variant">
-          <Spinner className="h-5 w-5" />
-          <span className="text-body-md">Carregando disciplinas...</span>
-        </div>
-      )}
-
       {/* Error */}
       {error && (
         <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg">
           <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {error}
-          <button onClick={fetchSubjects} className="ml-auto text-label-lg underline hover:no-underline">
+          <button onClick={() => setReloadKey((k) => k + 1)} className="ml-auto text-label-lg underline hover:no-underline">
             Tentar novamente
           </button>
         </div>
       )}
 
-      {/* Empty state */}
-      {!loading && !error && subjects.length === 0 && (
+      {/* Empty state: nenhuma disciplina e sem busca ativa */}
+      {!loading && !error && subjects.length === 0 && !activeSearch && (
         <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
           <span
             className="material-symbols-outlined text-outline mb-sm block"
@@ -110,19 +133,57 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Subject Grid */}
-      {!loading && subjects.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
-          {subjects.map((subject) => (
-            <SubjectCard
-              key={subject.id}
-              subject={subject}
-              onEdit={() => navigate(`/subjects/${subject.id}/edit`)}
-              onDelete={() => setDeleteTarget(subject)}
-              username={user?.username ?? ''}
+      {/* Busca + resultados (quando há disciplinas ou uma busca ativa) */}
+      {(subjects.length > 0 || activeSearch || (loading && page === 1)) && !error && (
+        <>
+          <div className="relative mb-lg max-w-md">
+            <span
+              className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+              style={{ fontSize: 20 }}
+            >
+              search
+            </span>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Buscar disciplinas pelo nome..."
+              className="w-full pl-[44px] pr-[44px] py-sm bg-surface-container-lowest border border-outline-variant rounded-xl text-body-md text-on-surface placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
             />
-          ))}
-        </div>
+            {loading && (
+              <span className="absolute right-md top-1/2 -translate-y-1/2">
+                <Spinner className="h-5 w-5 text-primary" />
+              </span>
+            )}
+          </div>
+
+          {loading && subjects.length === 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-[180px] rounded-xl border border-outline-variant bg-surface-container-low animate-pulse" />
+              ))}
+            </div>
+          ) : subjects.length > 0 ? (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+                {subjects.map((subject) => (
+                  <SubjectCard
+                    key={subject.id}
+                    subject={subject}
+                    onEdit={() => navigate(`/subjects/${subject.id}/edit`)}
+                    onDelete={() => setDeleteTarget(subject)}
+                    username={user?.username ?? ''}
+                  />
+                ))}
+              </div>
+              {meta && <Pagination meta={meta} loading={loading} onPageChange={setPage} />}
+            </>
+          ) : (
+            <p className="text-center text-body-md text-on-surface-variant py-xl">
+              Nenhuma disciplina encontrada para "{activeSearch}".
+            </p>
+          )}
+        </>
       )}
 
       <ConfirmModal

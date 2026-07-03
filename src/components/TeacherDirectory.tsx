@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { listTeachers, type PaginationMeta, type TeacherListItem } from '../pages/Search/search.service'
+import { useAuth } from '../contexts/AuthContext'
 import Spinner from './Spinner'
 
 const PAGE_LIMIT = 12
@@ -10,6 +11,8 @@ const PAGE_LIMIT = 12
  * Auto-suficiente (faz o próprio fetch); reutilizável na home e no perfil do aluno.
  */
 export default function TeacherDirectory() {
+  const { user } = useAuth()
+  const isStudent = user?.role === 'STUDENT'
   const [query, setQuery] = useState('')
   const [activeSearch, setActiveSearch] = useState('')
   const [page, setPage] = useState(1)
@@ -119,7 +122,9 @@ export default function TeacherDirectory() {
           <p className="text-body-md text-on-surface-variant">
             {activeSearch
               ? `Nenhum professor encontrado para "${activeSearch}".`
-              : 'Nenhum professor cadastrado ainda.'}
+              : isStudent
+                ? 'Você ainda não tem vínculo com nenhum professor. Entre em uma turma para vê-los aqui.'
+                : 'Nenhum professor cadastrado ainda.'}
           </p>
         </div>
       )}

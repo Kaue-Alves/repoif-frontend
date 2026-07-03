@@ -6,6 +6,7 @@ import ReportModal from '../../components/ReportModal'
 import AppLayout from '../../components/layouts/AppLayout'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
+import AssignmentsTab from './AssignmentsTab'
 import {
   type FileRecord,
   type SubjectWithTeacher,
@@ -70,6 +71,8 @@ export default function SubjectDetail() {
   const [qrConfirm, setQrConfirm] = useState<FileRecord | null>(null)
 
   const [reportTarget, setReportTarget] = useState<FileRecord | null>(null)
+
+  const [tab, setTab] = useState<'materials' | 'assignments'>('materials')
 
   const isOwner = !!user && subject?.teacherUsername === user.username
 
@@ -332,8 +335,31 @@ export default function SubjectDetail() {
           )}
         </div>
 
+        {/* Tabs: Materiais de aula / Trabalhos */}
+        <div className="flex gap-xs border-b border-outline-variant">
+          {[
+            { key: 'materials' as const, label: 'Materiais de aula', icon: 'folder' },
+            { key: 'assignments' as const, label: 'Trabalhos', icon: 'assignment' },
+          ].map((t) => (
+            <button
+              key={t.key}
+              onClick={() => setTab(t.key)}
+              className={`flex items-center gap-xs px-md py-sm text-label-lg whitespace-nowrap border-b-2 -mb-px transition-colors ${
+                tab === t.key
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-on-surface-variant hover:text-on-surface'
+              }`}
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{t.icon}</span>
+              {t.label}
+            </button>
+          ))}
+        </div>
+
+        {tab === 'assignments' && id && <AssignmentsTab subjectId={id} isOwner={isOwner} />}
+
         {/* Upload panel (teacher owner only) */}
-        {isOwner && (
+        {tab === 'materials' && isOwner && (
           <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg space-y-md">
             <h2 className="text-headline-sm text-on-surface flex items-center gap-sm">
               <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>upload_file</span>
@@ -490,11 +516,12 @@ export default function SubjectDetail() {
           </div>
         )}
 
-        {/* File list */}
+        {/* Materiais de aula (lista de arquivos) */}
+        {tab === 'materials' && (
         <div className="space-y-md">
           <h2 className="text-headline-sm text-on-surface flex items-center gap-sm">
             <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>folder_open</span>
-            Arquivos
+            Materiais de aula
             {!loadingFiles && (
               <span className="text-label-sm text-on-surface-variant font-normal">({files.length})</span>
             )}
@@ -586,13 +613,15 @@ export default function SubjectDetail() {
                       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
                     </button>
 
-                    <button
-                      onClick={() => handleShowQr(file)}
-                      title="Compartilhar via QR code"
-                      className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface hover:bg-surface-container-high transition-all"
-                    >
-                      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>qr_code_2</span>
-                    </button>
+                    {user?.role !== 'STUDENT' && (
+                      <button
+                        onClick={() => handleShowQr(file)}
+                        title="Compartilhar via QR code"
+                        className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface hover:bg-surface-container-high transition-all"
+                      >
+                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>qr_code_2</span>
+                      </button>
+                    )}
 
                     {user && !isOwner && (
                       <button
@@ -640,6 +669,7 @@ export default function SubjectDetail() {
             </ul>
           )}
         </div>
+        )}
       </div>
 
       <ConfirmModal
