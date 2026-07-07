@@ -11,7 +11,8 @@ export interface UserProfile {
   id: string
   username: string
   role: 'TEACHER' | 'STUDENT'
-  subjects: Subject[]
+  // A API pode omitir `subjects` (ex.: perfis de aluno), então é opcional.
+  subjects?: Subject[]
 }
 
 export async function getUserProfile(username: string): Promise<UserProfile> {

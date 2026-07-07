@@ -51,7 +51,10 @@ export default function Profile() {
         </div>
       )}
 
-      {!loading && profile && (
+      {!loading && profile && (() => {
+        // A API pode não retornar `subjects` (ex.: perfis de aluno); normaliza para lista vazia.
+        const subjects = profile.subjects ?? []
+        return (
         <>
           {/* Profile Header */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-lg mb-xl pb-xl border-b border-outline-variant">
@@ -83,8 +86,8 @@ export default function Profile() {
 
               {profile.role === 'TEACHER' && (
                 <p className="text-body-md text-on-surface-variant">
-                  {profile.subjects.length}{' '}
-                  {profile.subjects.length === 1 ? 'disciplina pública' : 'disciplinas públicas'}
+                  {subjects.length}{' '}
+                  {subjects.length === 1 ? 'disciplina pública' : 'disciplinas públicas'}
                   {isOwner && ' (você pode ver as privadas também)'}
                 </p>
               )}
@@ -123,7 +126,7 @@ export default function Profile() {
               {profile.role === 'TEACHER' ? 'Disciplinas' : 'Informações'}
             </h2>
 
-            {profile.subjects.length === 0 ? (
+            {subjects.length === 0 ? (
               <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
                 <span
                   className="material-symbols-outlined text-outline block mb-sm"
@@ -150,7 +153,7 @@ export default function Profile() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
-                {profile.subjects.map((subject) => (
+                {subjects.map((subject) => (
                   <PublicSubjectCard key={subject.id} subject={subject} isOwner={isOwner} ownerUsername={profile.username} />
                 ))}
               </div>
@@ -158,7 +161,8 @@ export default function Profile() {
           </div>
           )}
         </>
-      )}
+        )
+      })()}
 
       {profile && (
         <ReportModal
