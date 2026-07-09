@@ -1,4 +1,5 @@
 import httpClient from '../../utils/httpClient'
+import type { Paginated } from '../../utils/pagination'
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
@@ -45,24 +46,9 @@ export interface CreateClassroomBody {
   description?: string
 }
 
-export interface PageMeta {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
-}
+export type PaginatedClassrooms = Paginated<Classroom>
 
-export interface PaginatedClassrooms {
-  data: Classroom[]
-  meta: PageMeta
-}
-
-export interface PaginatedClassroomSubjects {
-  data: ClassroomSubject[]
-  meta: PageMeta
-}
+export type PaginatedClassroomSubjects = Paginated<ClassroomSubject>
 
 // ─── Turmas ─────────────────────────────────────────────────────────────────
 
@@ -181,10 +167,4 @@ export async function joinClassroomByInvite(token: string): Promise<JoinResult> 
 
 // ─── Utilitários ────────────────────────────────────────────────────────────────
 
-export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-}
+export { formatDate } from '../../utils/format'
