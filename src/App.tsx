@@ -3,6 +3,7 @@ import AdminRoute from './components/AdminRoute'
 import ProtectedRoute from './components/ProtectedRoute'
 import TeacherRoute from './components/TeacherRoute'
 import { useAuth } from './contexts/AuthContext'
+import { homePathFor } from './utils/roles'
 import AdminDashboard from './pages/Admin/AdminDashboard'
 import AdminFiles from './pages/Admin/AdminFiles'
 import AdminReports from './pages/Admin/AdminReports'
@@ -26,10 +27,8 @@ import VerifyEmail from './pages/VerifyEmail/VerifyEmail'
 
 function RootRedirect() {
   const { user, isAuthenticated } = useAuth()
-  if (!isAuthenticated) return <Navigate to="/login" replace />
-  if (user?.role === 'ADMIN') return <Navigate to="/admin" replace />
-  if (user?.role === 'TEACHER') return <Navigate to="/dashboard" replace />
-  return <Navigate to={`/profile/${user?.username}`} replace />
+  if (!isAuthenticated || !user) return <Navigate to="/login" replace />
+  return <Navigate to={homePathFor(user)} replace />
 }
 
 function App() {

@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
+import Pagination from '../../components/Pagination'
 import QrCodeModal from '../../components/QrCodeModal'
 import ReportModal from '../../components/ReportModal'
 import AppLayout from '../../components/layouts/AppLayout'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
+import { useToast } from '../../contexts/ToastContext'
+import { clientPageMeta } from '../../utils/pagination'
 import AssignmentsTab from './AssignmentsTab'
 import {
   type FileRecord,
@@ -35,18 +38,26 @@ interface RenameState {
   value: string
 }
 
+const FILES_PAGE_LIMIT = 10
+
 export default function SubjectDetail() {
   const { id } = useParams<{ id: string }>()
   const location = useLocation()
   const navigate = useNavigate()
   const { user } = useAuth()
+  const showToast = useToast()
 
+  // O subject do location.state é só cache otimista de exibição; a versão da API
+  // (buscada sempre) é quem manda, inclusive para decidir posse.
   const [subject, setSubject] = useState<SubjectWithTeacher | null>(
     (location.state as { subject?: SubjectWithTeacher })?.subject ?? null
   )
   const [loadingSubject, setLoadingSubject] = useState(!subject)
   const [files, setFiles] = useState<FileRecord[]>([])
   const [loadingFiles, setLoadingFiles] = useState(true)
+  const [filesError, setFilesError] = useState('')
+  const [filesReload, setFilesReload] = useState(0)
+  const [filesPage, setFilesPage] = useState(1)
   const [pageError, setPageError] = useState('')
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -72,31 +83,67 @@ export default function SubjectDetail() {
 
   const [reportTarget, setReportTarget] = useState<FileRecord | null>(null)
 
-  const [tab, setTab] = useState<'materials' | 'assignments'>('materials')
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tab: 'materials' | 'assignments' =
+    searchParams.get('tab') === 'assignments' ? 'assignments' : 'materials'
 
-  const isOwner = !!user && subject?.teacherUsername === user.username
+  // Posse decidida preferencialmente pelo id do docente vindo da API — o username do
+  // location.state é controlado pelo cliente e serve só de fallback de exibição.
+  const isOwner =
+    !!user &&
+    !!subject &&
+    (subject.teacherId ? subject.teacherId === user.sub : subject.teacherUsername === user.username)
+
+  // Paginação client-side: a API devolve a lista inteira de arquivos.
+  const filesTotalPages = Math.max(1, Math.ceil(files.length / FILES_PAGE_LIMIT))
+  const safeFilesPage = Math.min(filesPage, filesTotalPages)
+  const pagedFiles = files.slice((safeFilesPage - 1) * FILES_PAGE_LIMIT, safeFilesPage * FILES_PAGE_LIMIT)
 
   useEffect(() => {
     if (!id) return
-    if (subject) {
-      setLoadingSubject(false)
-      return
-    }
+    const hadSeed = !!(location.state as { subject?: SubjectWithTeacher } | null)?.subject
+    let cancelled = false
     getSubject(id)
-      .then((data) => setSubject(data as SubjectWithTeacher))
-      .catch((err: unknown) => {
-        setPageError(err instanceof Error ? err.message : 'Disciplina não encontrada.')
+      .then((data) => {
+        if (!cancelled) setSubject(data)
       })
-      .finally(() => setLoadingSubject(false))
+      .catch((err: unknown) => {
+        if (cancelled) return
+        // Com cache otimista, mantém a exibição; sem ele, é erro de página mesmo.
+        if (!hadSeed) {
+          setPageError(err instanceof Error ? err.message : 'Disciplina não encontrada.')
+        }
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingSubject(false)
+      })
+    return () => {
+      cancelled = true
+    }
   }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!id) return
+    let cancelled = false
+    setLoadingFiles(true)
+    setFilesError('')
     getSubjectFiles(id)
-      .then(setFiles)
-      .catch(() => setFiles([]))
-      .finally(() => setLoadingFiles(false))
-  }, [id])
+      .then((data) => {
+        if (!cancelled) setFiles(data)
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return
+        // Falha não pode virar "nenhum arquivo": o professor acharia que perdeu tudo.
+        setFiles([])
+        setFilesError(err instanceof Error ? err.message : 'Erro ao carregar os arquivos.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingFiles(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [id, filesReload])
 
   function onFilesPicked(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -152,7 +199,7 @@ export default function SubjectDetail() {
       const url = await getDownloadUrl(file.id)
       window.open(url, '_blank', 'noopener,noreferrer')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao abrir o arquivo.')
+      showToast(err instanceof Error ? err.message : 'Erro ao abrir o arquivo.')
     }
   }
 
@@ -206,7 +253,7 @@ export default function SubjectDetail() {
       a.remove()
       URL.revokeObjectURL(objectUrl)
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao baixar o arquivo.')
+      showToast(err instanceof Error ? err.message : 'Erro ao baixar o arquivo.')
     }
   }
 
@@ -216,7 +263,7 @@ export default function SubjectDetail() {
       const updated = await patchFile(file.id, { isPublic: !file.isPublic })
       setFiles((prev) => prev.map((f) => (f.id === updated.id ? updated : f)))
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao atualizar visibilidade.')
+      showToast(err instanceof Error ? err.message : 'Erro ao atualizar visibilidade.')
     } finally {
       setTogglingIds((s) => {
         const next = new Set(s)
@@ -236,7 +283,7 @@ export default function SubjectDetail() {
       setFiles((prev) => prev.map((f) => (f.id === updated.id ? updated : f)))
       setRename(null)
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao renomear arquivo.')
+      showToast(err instanceof Error ? err.message : 'Erro ao renomear arquivo.')
     } finally {
       setRenameSaving(false)
     }
@@ -250,7 +297,7 @@ export default function SubjectDetail() {
       setFiles((prev) => prev.filter((f) => f.id !== deleteTarget.id))
       setDeleteTarget(null)
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao excluir arquivo.')
+      showToast(err instanceof Error ? err.message : 'Erro ao excluir arquivo.')
     } finally {
       setDeleting(false)
     }
@@ -343,7 +390,7 @@ export default function SubjectDetail() {
           ].map((t) => (
             <button
               key={t.key}
-              onClick={() => setTab(t.key)}
+              onClick={() => setSearchParams({ tab: t.key })}
               className={`flex items-center gap-xs px-md py-sm text-label-lg whitespace-nowrap border-b-2 -mb-px transition-colors ${
                 tab === t.key
                   ? 'border-primary text-primary'
@@ -531,6 +578,20 @@ export default function SubjectDetail() {
             <div className="flex justify-center py-xl">
               <Spinner className="h-6 w-6 text-primary" />
             </div>
+          ) : filesError ? (
+            <div
+              role="alert"
+              className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md"
+            >
+              <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+              {filesError}
+              <button
+                onClick={() => setFilesReload((k) => k + 1)}
+                className="ml-auto text-label-lg underline hover:no-underline"
+              >
+                Tentar novamente
+              </button>
+            </div>
           ) : files.length === 0 ? (
             <div className="flex flex-col items-center gap-md py-xl text-center border-2 border-dashed border-outline-variant rounded-xl">
               <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48 }}>
@@ -540,7 +601,7 @@ export default function SubjectDetail() {
             </div>
           ) : (
             <ul className="space-y-sm">
-              {files.map((file) => (
+              {pagedFiles.map((file) => (
                 <li
                   key={file.id}
                   className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-md hover:bg-surface-container-low transition-colors"
@@ -667,6 +728,13 @@ export default function SubjectDetail() {
                 </li>
               ))}
             </ul>
+          )}
+
+          {!loadingFiles && !filesError && files.length > FILES_PAGE_LIMIT && (
+            <Pagination
+              meta={clientPageMeta(safeFilesPage, FILES_PAGE_LIMIT, files.length)}
+              onPageChange={setFilesPage}
+            />
           )}
         </div>
         )}

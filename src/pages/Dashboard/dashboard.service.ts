@@ -1,4 +1,5 @@
 import httpClient from '../../utils/httpClient'
+import type { Paginated } from '../../utils/pagination'
 
 export interface Subject {
   id: string
@@ -7,19 +8,7 @@ export interface Subject {
   isPublic: boolean
 }
 
-export interface PageMeta {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
-}
-
-export interface PaginatedSubjects {
-  data: Subject[]
-  meta: PageMeta
-}
+export type PaginatedSubjects = Paginated<Subject>
 
 /**
  * Um backend desatualizado devolve o array cru em vez de `{ data, meta }`. Falhar aqui,

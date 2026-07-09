@@ -2,6 +2,8 @@ import { Component, type ErrorInfo, type ReactNode } from 'react'
 
 interface Props {
   children: ReactNode
+  /** Quando muda (ex.: navegação), um erro capturado é descartado e a árvore re-renderiza. */
+  resetKey?: string
 }
 
 interface State {
@@ -21,6 +23,12 @@ export default class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, info: ErrorInfo) {
     console.error('Erro não tratado na interface:', error, info.componentStack)
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (this.state.error && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ error: null })
+    }
   }
 
   render() {

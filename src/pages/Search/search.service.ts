@@ -1,4 +1,5 @@
 import httpClient from '../../utils/httpClient'
+import type { Paginated } from '../../utils/pagination'
 
 export interface TeacherListItem {
   id: string
@@ -7,19 +8,9 @@ export interface TeacherListItem {
   publicSubjectsCount: number
 }
 
-export interface PaginationMeta {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
-}
+export type { PageMeta as PaginationMeta } from '../../utils/pagination'
 
-export interface PaginatedTeachers {
-  data: TeacherListItem[]
-  meta: PaginationMeta
-}
+export type PaginatedTeachers = Paginated<TeacherListItem>
 
 /**
  * Lista professores (endpoint público, paginado). `search` só é aplicado com 2+ caracteres.

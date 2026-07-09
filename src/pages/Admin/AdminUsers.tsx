@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminLayout from './AdminLayout'
-import Pagination from './Pagination'
 import ConfirmModal from '../../components/ConfirmModal'
+import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
+import type { PageMeta } from '../../utils/pagination'
+import { ROLE_LABELS } from '../../utils/roles'
 import {
   createUser,
   deleteUser,
@@ -12,14 +14,7 @@ import {
   updateUserRole,
   type AdminRole,
   type AdminUser,
-  type PageMeta,
 } from './admin.service'
-
-const ROLE_LABELS: Record<AdminRole, string> = {
-  ADMIN: 'Administrador',
-  TEACHER: 'Professor',
-  STUDENT: 'Aluno',
-}
 
 const ROLE_OPTIONS: AdminRole[] = ['ADMIN', 'TEACHER', 'STUDENT']
 const LIMIT = 20

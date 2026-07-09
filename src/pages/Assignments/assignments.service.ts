@@ -199,27 +199,11 @@ export async function submitAssignment(
 
 // ─── Utilitários ────────────────────────────────────────────────────────────────
 
-export function formatDateTime(iso: string): string {
-  return new Date(iso).toLocaleString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  })
-}
+export { formatDate, formatDateTime } from '../../utils/format'
 
-/** Data no formato dd/mm/aaaa (sem horário). */
-export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-}
-
-export function isPastDue(iso: string): boolean {
-  return new Date(iso).getTime() < Date.now()
+/** `now` vem do hook useNow para que prazos vencendo com a tela aberta atualizem a UI. */
+export function isPastDue(iso: string, now: number = Date.now()): boolean {
+  return new Date(iso).getTime() < now
 }
 
 const pad = (n: number) => String(n).padStart(2, '0')

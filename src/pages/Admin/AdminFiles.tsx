@@ -1,15 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import AdminLayout from './AdminLayout'
-import Pagination from './Pagination'
 import ConfirmModal from '../../components/ConfirmModal'
+import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
+import type { PageMeta } from '../../utils/pagination'
 import { formatDate, formatFileSize, getMimeIcon } from '../Subjects/subjects.service'
 import {
   deleteFile,
   listFiles,
   restoreFile,
   type AdminFile,
-  type PageMeta,
 } from './admin.service'
 
 const LIMIT = 20

@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { listTeachers, type PaginationMeta, type TeacherListItem } from '../pages/Search/search.service'
+import { listTeachers, type TeacherListItem } from '../pages/Search/search.service'
 import { useAuth } from '../contexts/AuthContext'
+import { usePaginatedList } from '../hooks/usePaginatedList'
 import Spinner from './Spinner'
 
 const PAGE_LIMIT = 12
@@ -13,51 +13,20 @@ const PAGE_LIMIT = 12
 export default function TeacherDirectory() {
   const { user } = useAuth()
   const isStudent = user?.role === 'STUDENT'
-  const [query, setQuery] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
-  const [page, setPage] = useState(1)
 
-  const [teachers, setTeachers] = useState<TeacherListItem[]>([])
-  const [meta, setMeta] = useState<PaginationMeta | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  // Debounce o texto digitado e volta para a primeira página ao mudar a busca.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      const trimmed = query.trim()
-      setActiveSearch(trimmed.length >= 2 ? trimmed : '')
-      setPage(1)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [query])
-
-  // Busca a lista sempre que a página ou o termo ativo mudam.
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setError('')
-
-    listTeachers(page, PAGE_LIMIT, activeSearch)
-      .then((res) => {
-        if (cancelled) return
-        setTeachers(res.data)
-        setMeta(res.meta)
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return
-        setTeachers([])
-        setMeta(null)
-        setError(err instanceof Error ? err.message : 'Falha ao carregar professores.')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [page, activeSearch])
+  const {
+    items: teachers,
+    meta,
+    loading,
+    error,
+    search: query,
+    setSearch: setQuery,
+    activeSearch,
+    setPage,
+  } = usePaginatedList((page, limit, search) => listTeachers(page, limit, search), {
+    limit: PAGE_LIMIT,
+    minSearchLength: 2,
+  })
 
   const hasResults = teachers.length > 0
 

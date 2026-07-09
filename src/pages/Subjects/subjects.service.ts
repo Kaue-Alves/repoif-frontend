@@ -11,6 +11,8 @@ export interface Subject {
 
 export interface SubjectWithTeacher extends Subject {
   teacherUsername: string
+  /** Presente quando a resposta vem da API; permite decidir posse por id, não por username. */
+  teacherId?: string
 }
 
 export interface SubjectBody {
@@ -55,8 +57,9 @@ export interface ConfirmUploadBody {
 
 // ─── Subjects ─────────────────────────────────────────────────────────────────
 
-export async function getSubject(id: string): Promise<Subject> {
-  const { data } = await httpClient.get<Subject>(`/subjects/${id}`)
+/** A rota de leitura devolve a disciplina com o username do docente (findOneForViewer). */
+export async function getSubject(id: string): Promise<SubjectWithTeacher> {
+  const { data } = await httpClient.get<SubjectWithTeacher>(`/subjects/${id}`)
   return data
 }
 
@@ -145,10 +148,4 @@ export function getMimeIcon(mimeType: string): string {
   return 'insert_drive_file'
 }
 
-export function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-  })
-}
+export { formatDate } from '../../utils/format'

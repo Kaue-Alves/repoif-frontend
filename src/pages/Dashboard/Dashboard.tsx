@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
-import Pagination, { type PageMeta } from '../../components/Pagination'
+import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
+import { useToast } from '../../contexts/ToastContext'
+import { usePaginatedList } from '../../hooks/usePaginatedList'
 import { deleteSubject, listSubjects, type Subject } from './dashboard.service'
 
 const PAGE_LIMIT = 9
@@ -12,69 +14,37 @@ const PAGE_LIMIT = 9
 export default function Dashboard() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const showToast = useToast()
 
-  const [subjects, setSubjects] = useState<Subject[]>([])
-  const [meta, setMeta] = useState<PageMeta | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  const [search, setSearch] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
-  const [page, setPage] = useState(1)
-  const [reloadKey, setReloadKey] = useState(0)
+  const {
+    items: subjects,
+    meta,
+    loading,
+    error,
+    search,
+    setSearch,
+    activeSearch,
+    setPage,
+    reload,
+    reloadAfterRemove,
+    page,
+  } = usePaginatedList((page, limit, search) => listSubjects(page, limit, search), {
+    limit: PAGE_LIMIT,
+  })
 
   // delete modal
   const [deleteTarget, setDeleteTarget] = useState<Subject | null>(null)
   const [deleting, setDeleting] = useState(false)
-
-  // Debounce da busca: volta para a primeira página ao mudar o termo.
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setActiveSearch(search.trim())
-      setPage(1)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [search])
-
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setError('')
-    listSubjects(page, PAGE_LIMIT, activeSearch)
-      .then((res) => {
-        if (cancelled) return
-        setSubjects(res.data)
-        setMeta(res.meta)
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return
-        setSubjects([])
-        setMeta(null)
-        setError(err instanceof Error ? err.message : 'Erro ao carregar disciplinas.')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [page, activeSearch, reloadKey])
 
   async function handleDeleteConfirm() {
     if (!deleteTarget) return
     setDeleting(true)
     try {
       await deleteSubject(deleteTarget.id)
-      const wasLastOnPage = subjects.length === 1
       setDeleteTarget(null)
-      // Se a página ficou vazia e não é a primeira, volta uma página; senão recarrega.
-      if (wasLastOnPage && page > 1) {
-        setPage((p) => p - 1)
-      } else {
-        setReloadKey((k) => k + 1)
-      }
+      reloadAfterRemove()
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao excluir disciplina.')
+      showToast(err instanceof Error ? err.message : 'Erro ao excluir disciplina.')
     } finally {
       setDeleting(false)
     }
@@ -101,10 +71,13 @@ export default function Dashboard() {
 
       {/* Error */}
       {error && (
-        <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg">
+        <div
+          role="alert"
+          className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg"
+        >
           <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {error}
-          <button onClick={() => setReloadKey((k) => k + 1)} className="ml-auto text-label-lg underline hover:no-underline">
+          <button onClick={reload} className="ml-auto text-label-lg underline hover:no-underline">
             Tentar novamente
           </button>
         </div>

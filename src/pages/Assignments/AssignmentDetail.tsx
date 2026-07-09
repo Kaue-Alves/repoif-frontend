@@ -1,8 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
 import Spinner from '../../components/Spinner'
+import { useAuth } from '../../contexts/AuthContext'
+import { useToast } from '../../contexts/ToastContext'
+import { useNow } from '../../hooks/useNow'
 import { formatFileSize, getMimeIcon } from '../Subjects/subjects.service'
 import {
   allowResubmit,
@@ -27,6 +30,9 @@ import {
 export default function AssignmentDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const { user } = useAuth()
+  const showToast = useToast()
+  const now = useNow()
 
   const [assignment, setAssignment] = useState<AssignmentDetailType | null>(null)
   const [loading, setLoading] = useState(true)
@@ -60,7 +66,7 @@ export default function AssignmentDetail() {
       const url = await getAttachmentDownloadUrl(id)
       window.open(url, '_blank', 'noopener,noreferrer')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao abrir o anexo.')
+      showToast(err instanceof Error ? err.message : 'Erro ao abrir o anexo.')
     }
   }
 
@@ -71,7 +77,7 @@ export default function AssignmentDetail() {
       await deleteAssignment(id)
       navigate(`/subjects/${assignment?.subjectId ?? ''}`)
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao excluir trabalho.')
+      showToast(err instanceof Error ? err.message : 'Erro ao excluir trabalho.')
       setDeleting(false)
     }
   }
@@ -102,7 +108,7 @@ export default function AssignmentDetail() {
     )
   }
 
-  const past = isPastDue(assignment.dueDate)
+  const past = isPastDue(assignment.dueDate, now)
 
   return (
     <AppLayout>
@@ -171,10 +177,17 @@ export default function AssignmentDetail() {
           </div>
         </div>
 
+        {/* Três papéis, três visões: dono corrige; aluno entrega; qualquer outro
+            (outro professor, admin) só lê — sem área de upload que não lhe pertence. */}
         {assignment.isOwner ? (
           <TeacherSubmissions assignmentId={id} />
-        ) : (
+        ) : user?.role === 'STUDENT' ? (
           <StudentSubmission assignment={assignment} past={past} onChanged={() => fetchAssignment(id)} />
+        ) : (
+          <p className="flex items-center gap-sm text-body-md text-on-surface-variant bg-surface-container-low rounded-xl px-md py-sm">
+            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>visibility</span>
+            Você está visualizando este trabalho. Apenas alunos da turma podem enviar entregas.
+          </p>
         )}
       </div>
 
@@ -215,6 +228,7 @@ function StudentSubmission({
   past: boolean
   onChanged: () => void
 }) {
+  const showToast = useToast()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
@@ -246,7 +260,7 @@ function StudentSubmission({
       const url = await getSubmissionDownloadUrl(assignment.id, submission.id)
       window.open(url, '_blank', 'noopener,noreferrer')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao abrir o arquivo.')
+      showToast(err instanceof Error ? err.message : 'Erro ao abrir o arquivo.')
     }
   }
 
@@ -348,10 +362,14 @@ function StudentSubmission({
 // ─── Professor: entregas ──────────────────────────────────────────────────────
 
 function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
+  const showToast = useToast()
   const [overview, setOverview] = useState<SubmissionsOverview | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [view, setView] = useState<'submitted' | 'notSubmitted'>('submitted')
+  // A visão ativa vive na URL: sobrevive a F5 e é compartilhável.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const view: 'submitted' | 'notSubmitted' =
+    searchParams.get('view') === 'notSubmitted' ? 'notSubmitted' : 'submitted'
   const [busyId, setBusyId] = useState<string | null>(null)
 
   useEffect(() => {
@@ -376,7 +394,7 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
       const url = await getSubmissionDownloadUrl(assignmentId, submissionId)
       window.open(url, '_blank', 'noopener,noreferrer')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao abrir o arquivo.')
+      showToast(err instanceof Error ? err.message : 'Erro ao abrir o arquivo.')
     }
   }
 
@@ -386,7 +404,7 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
       await allowResubmit(assignmentId, studentId)
       await load()
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao liberar reenvio.')
+      showToast(err instanceof Error ? err.message : 'Erro ao liberar reenvio.')
     } finally {
       setBusyId(null)
     }
@@ -415,7 +433,7 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
       {/* Toggle */}
       <div className="flex gap-xs p-xs bg-surface-container-high rounded-lg w-fit">
         <button
-          onClick={() => setView('submitted')}
+          onClick={() => setSearchParams({ view: 'submitted' })}
           className={`px-md py-xs rounded-md text-label-lg transition-colors ${
             view === 'submitted' ? 'bg-surface text-on-surface shadow-sm' : 'text-on-surface-variant'
           }`}
@@ -423,7 +441,7 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
           Entregaram ({overview.submittedCount})
         </button>
         <button
-          onClick={() => setView('notSubmitted')}
+          onClick={() => setSearchParams({ view: 'notSubmitted' })}
           className={`px-md py-xs rounded-md text-label-lg transition-colors ${
             view === 'notSubmitted' ? 'bg-surface text-on-surface shadow-sm' : 'text-on-surface-variant'
           }`}
@@ -636,9 +654,12 @@ function EditAssignmentModal({
         </label>
         <label className="flex flex-col gap-xs">
           <span className="text-label-lg text-on-surface-variant">Data limite de entrega</span>
+          {/* `min` só quando a data original já é futura: um prazo antigo no passado
+              deixaria o campo nativamente inválido e bloquearia salvar outras edições. */}
           <input
             type="date"
             value={dueDate}
+            min={originalDueDate >= tomorrowDateInput() ? tomorrowDateInput() : undefined}
             onChange={(e) => setDueDate(e.target.value)}
             className="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-lg text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
           />

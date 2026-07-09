@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import AdminLayout from './AdminLayout'
-import Pagination from './Pagination'
+import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
+import type { PageMeta } from '../../utils/pagination'
 import {
   REASON_LABELS,
   STATUS_LABELS,
@@ -14,7 +15,6 @@ import {
   listReports,
   updateReportStatus,
   type AdminReport,
-  type PageMeta,
 } from './admin.service'
 
 const LIMIT = 20

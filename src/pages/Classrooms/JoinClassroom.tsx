@@ -52,7 +52,33 @@ export default function JoinClassroom() {
           </div>
         )}
 
-        {!loading && result && (
+        {/* A API distingue entrada imediata (ACTIVE) de pedido pendente (PENDING);
+            mostrar sempre "aguarde aprovação" mentiria no primeiro caso. */}
+        {!loading && result && result.status === 'ACTIVE' && (
+          <div>
+            <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mx-auto mb-md">
+              <span
+                className="material-symbols-outlined text-on-primary-container"
+                style={{ fontSize: 32, fontVariationSettings: "'FILL' 1" }}
+              >
+                check_circle
+              </span>
+            </div>
+            <h1 className="text-headline-sm text-on-surface mb-xs">Você entrou na turma!</h1>
+            <p className="text-body-md text-on-surface-variant mb-lg">
+              Agora você tem acesso à turma <strong>{result.classroom.name}</strong>.
+            </p>
+            <Link
+              to={`/classrooms/${result.classroom.id}`}
+              className="inline-flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
+            >
+              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>meeting_room</span>
+              Abrir a turma
+            </Link>
+          </div>
+        )}
+
+        {!loading && result && result.status === 'PENDING' && (
           <div>
             <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mx-auto mb-md">
               <span

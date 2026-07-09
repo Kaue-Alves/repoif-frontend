@@ -2,9 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
-import Pagination, { type PageMeta } from '../../components/Pagination'
+import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
+import { useToast } from '../../contexts/ToastContext'
+import { usePaginatedList } from '../../hooks/usePaginatedList'
 import {
   createClassroom,
   deleteClassroom,
@@ -18,68 +20,38 @@ const PAGE_LIMIT = 9
 export default function ClassroomList() {
   const { user } = useAuth()
   const navigate = useNavigate()
+  const showToast = useToast()
   const isTeacher = user?.role === 'TEACHER'
 
-  const [classrooms, setClassrooms] = useState<Classroom[]>([])
-  const [meta, setMeta] = useState<PageMeta | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
-
-  const [search, setSearch] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
-  const [page, setPage] = useState(1)
-  const [reloadKey, setReloadKey] = useState(0)
+  const {
+    items: classrooms,
+    meta,
+    loading,
+    error,
+    search,
+    setSearch,
+    activeSearch,
+    page,
+    setPage,
+    reload,
+    reloadAfterRemove,
+  } = usePaginatedList((page, limit, search) => listClassrooms(page, limit, search), {
+    limit: PAGE_LIMIT,
+  })
 
   const [createOpen, setCreateOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Classroom | null>(null)
   const [deleting, setDeleting] = useState(false)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setActiveSearch(search.trim())
-      setPage(1)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [search])
-
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setError('')
-    listClassrooms(page, PAGE_LIMIT, activeSearch)
-      .then((res) => {
-        if (cancelled) return
-        setClassrooms(res.data)
-        setMeta(res.meta)
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return
-        setClassrooms([])
-        setMeta(null)
-        setError(err instanceof Error ? err.message : 'Erro ao carregar turmas.')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [page, activeSearch, reloadKey])
 
   async function handleDeleteConfirm() {
     if (!deleteTarget) return
     setDeleting(true)
     try {
       await deleteClassroom(deleteTarget.id)
-      const wasLastOnPage = classrooms.length === 1
       setDeleteTarget(null)
-      if (wasLastOnPage && page > 1) {
-        setPage((p) => p - 1)
-      } else {
-        setReloadKey((k) => k + 1)
-      }
+      reloadAfterRemove()
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao excluir turma.')
+      showToast(err instanceof Error ? err.message : 'Erro ao excluir turma.')
     } finally {
       setDeleting(false)
     }
@@ -109,10 +81,13 @@ export default function ClassroomList() {
       </div>
 
       {error && (
-        <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg">
+        <div
+          role="alert"
+          className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg"
+        >
           <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {error}
-          <button onClick={() => setReloadKey((k) => k + 1)} className="ml-auto text-label-lg underline hover:no-underline">
+          <button onClick={reload} className="ml-auto text-label-lg underline hover:no-underline">
             Tentar novamente
           </button>
         </div>

@@ -1,26 +1,17 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthLayout from '../../components/layouts/AuthLayout'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
+import { homePathFor } from '../../utils/roles'
 import { loginUser } from './login.service'
-
-function decodeRole(token: string): { role: string; username: string } {
-  try {
-    const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')
-    const json = decodeURIComponent(
-      atob(base64).split('').map((c) => '%' + c.charCodeAt(0).toString(16).padStart(2, '0')).join('')
-    )
-    const payload = JSON.parse(json)
-    return { role: payload.role ?? '', username: payload.username ?? '' }
-  } catch {
-    return { role: '', username: '' }
-  }
-}
 
 export default function Login() {
   const { login } = useAuth()
   const navigate = useNavigate()
+  const location = useLocation()
+  const [searchParams] = useSearchParams()
+  const sessionExpired = searchParams.get('expired') === '1'
 
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
@@ -41,10 +32,11 @@ export default function Login() {
         : { username: identifier.trim(), password }
 
       const { token, expiresIn } = await loginUser(body)
-      login(token, expiresIn)
+      const user = login(token, expiresIn)
 
-      const { role, username } = decodeRole(token)
-      navigate(role === 'TEACHER' ? '/dashboard' : `/profile/${username}`, { replace: true })
+      // Volta para a rota que exigiu login (ex.: convite de turma); senão, home do papel.
+      const from = (location.state as { from?: { pathname: string; search: string } } | null)?.from
+      navigate(from ? `${from.pathname}${from.search}` : homePathFor(user), { replace: true })
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Erro ao fazer login'
       setError(translateError(msg))
@@ -55,6 +47,15 @@ export default function Login() {
 
   return (
     <AuthLayout title="Entrar na conta" subtitle="Acesse com username ou email">
+      {sessionExpired && !error && (
+        <div
+          role="alert"
+          className="flex items-start gap-sm bg-surface-container-high text-on-surface rounded-lg px-md py-sm text-body-md mb-md"
+        >
+          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>schedule</span>
+          Sua sessão expirou. Entre novamente para continuar.
+        </div>
+      )}
       <form onSubmit={handleSubmit} className="space-y-md">
         <Field label="Username ou email">
           <input

@@ -6,6 +6,7 @@ import ReportModal from '../../components/ReportModal'
 import Spinner from '../../components/Spinner'
 import TeacherDirectory from '../../components/TeacherDirectory'
 import { useAuth } from '../../contexts/AuthContext'
+import { ROLE_BADGE_CLASSES, ROLE_ICONS, ROLE_LABELS } from '../../utils/roles'
 
 export default function Profile() {
   const { username } = useParams<{ username: string }>()
@@ -63,7 +64,7 @@ export default function Profile() {
                 className="material-symbols-outlined text-on-primary-container"
                 style={{ fontSize: 40, fontVariationSettings: "'FILL' 1" }}
               >
-                {profile.role === 'TEACHER' ? 'school' : 'person'}
+                {ROLE_ICONS[profile.role]}
               </span>
             </div>
 
@@ -71,16 +72,12 @@ export default function Profile() {
               <div className="flex flex-wrap items-center gap-sm mb-xs">
                 <h1 className="text-headline-lg text-on-surface">@{profile.username}</h1>
                 <span
-                  className={`flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium ${
-                    profile.role === 'TEACHER'
-                      ? 'bg-primary-container/30 text-primary'
-                      : 'bg-tertiary-fixed/30 text-tertiary'
-                  }`}
+                  className={`flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium ${ROLE_BADGE_CLASSES[profile.role]}`}
                 >
                   <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
-                    {profile.role === 'TEACHER' ? 'school' : 'person'}
+                    {ROLE_ICONS[profile.role]}
                   </span>
-                  {profile.role === 'TEACHER' ? 'Professor' : 'Aluno'}
+                  {ROLE_LABELS[profile.role]}
                 </span>
               </div>
 
@@ -114,51 +111,84 @@ export default function Profile() {
             )}
           </div>
 
-          {/* Student owner: directory of teachers instead of an empty subjects section */}
-          {isOwner && profile.role === 'STUDENT' ? (
+          {/* Seção principal por papel. Alunos não têm disciplinas — participam de
+              turmas — então o perfil deles nunca exibe uma seção de disciplinas. */}
+          {profile.role === 'TEACHER' && (
             <div>
-              <h2 className="text-headline-sm text-on-surface mb-lg">Encontre professores</h2>
-              <TeacherDirectory />
-            </div>
-          ) : (
-          <div>
-            <h2 className="text-headline-sm text-on-surface mb-lg">
-              {profile.role === 'TEACHER' ? 'Disciplinas' : 'Informações'}
-            </h2>
+              <h2 className="text-headline-sm text-on-surface mb-lg">Disciplinas</h2>
 
-            {subjects.length === 0 ? (
-              <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
-                <span
-                  className="material-symbols-outlined text-outline block mb-sm"
-                  style={{ fontSize: 48 }}
-                >
-                  menu_book
-                </span>
-                <p className="text-body-md text-on-surface-variant">
-                  {isOwner
-                    ? profile.role === 'TEACHER'
-                      ? 'Você ainda não criou nenhuma disciplina.'
-                      : 'Você ainda não tem disciplinas públicas.'
-                    : 'Este professor não tem disciplinas públicas.'}
-                </p>
-                {isOwner && profile.role === 'TEACHER' && (
-                  <Link
-                    to="/subjects/new"
-                    className="inline-flex items-center gap-sm mt-lg bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
+              {subjects.length === 0 ? (
+                <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
+                  <span
+                    className="material-symbols-outlined text-outline block mb-sm"
+                    style={{ fontSize: 48 }}
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
-                    Criar disciplina
-                  </Link>
-                )}
+                    menu_book
+                  </span>
+                  <p className="text-body-md text-on-surface-variant">
+                    {isOwner
+                      ? 'Você ainda não criou nenhuma disciplina.'
+                      : 'Este professor ainda não tem disciplinas públicas.'}
+                  </p>
+                  {isOwner && (
+                    <Link
+                      to="/subjects/new"
+                      className="inline-flex items-center gap-sm mt-lg bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
+                    >
+                      <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+                      Criar disciplina
+                    </Link>
+                  )}
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
+                  {subjects.map((subject) => (
+                    <PublicSubjectCard key={subject.id} subject={subject} isOwner={isOwner} ownerUsername={profile.username} />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {profile.role === 'STUDENT' &&
+            (isOwner ? (
+              <div>
+                <h2 className="text-headline-sm text-on-surface mb-lg">Encontre professores</h2>
+                <TeacherDirectory />
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-lg">
-                {subjects.map((subject) => (
-                  <PublicSubjectCard key={subject.id} subject={subject} isOwner={isOwner} ownerUsername={profile.username} />
-                ))}
+              <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
+                <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>
+                  school
+                </span>
+                <p className="text-body-md text-on-surface-variant">
+                  @{profile.username} é aluno e participa de turmas por convite dos professores.
+                </p>
               </div>
-            )}
-          </div>
+            ))}
+
+          {profile.role === 'ADMIN' && isOwner && (
+            <Link
+              to="/admin"
+              className="flex items-center gap-md p-lg bg-surface-container-lowest border border-outline-variant rounded-xl hover:bg-surface-container-low hover:border-primary/40 transition-all group"
+            >
+              <div className="w-12 h-12 rounded-xl bg-secondary-container/40 flex items-center justify-center flex-shrink-0">
+                <span className="material-symbols-outlined text-secondary" style={{ fontSize: 26 }}>
+                  admin_panel_settings
+                </span>
+              </div>
+              <div className="flex-1">
+                <p className="text-label-lg text-on-surface group-hover:text-primary transition-colors">
+                  Painel de administração
+                </p>
+                <p className="text-label-sm text-on-surface-variant">
+                  Gerencie usuários, arquivos e denúncias.
+                </p>
+              </div>
+              <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" style={{ fontSize: 20 }}>
+                chevron_right
+              </span>
+            </Link>
           )}
         </>
         )

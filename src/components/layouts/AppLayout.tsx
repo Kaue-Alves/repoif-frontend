@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../../contexts/AuthContext'
+import { ROLE_LABELS, homePathFor } from '../../utils/roles'
 
 interface AppLayoutProps {
   children: React.ReactNode
@@ -23,31 +24,21 @@ export default function AppLayout({ children }: AppLayoutProps) {
     navigate('/login')
   }
 
-  const logoHref = !user
-    ? '/search'
-    : user.role === 'ADMIN'
-      ? '/admin'
-      : user.role === 'TEACHER'
-        ? '/dashboard'
-        : `/profile/${user.username}`
+  const logoHref = user ? homePathFor(user) : '/search'
 
   const navItems: NavItem[] = [
     { to: '/search', label: 'Buscar', icon: 'search' },
     ...(user?.role === 'ADMIN' ? [{ to: '/admin', label: 'Admin', icon: 'admin_panel_settings' }] : []),
     ...(user?.role === 'TEACHER' ? [{ to: '/dashboard', label: 'Disciplinas', icon: 'dashboard' }] : []),
     ...(user && user.role !== 'ADMIN' ? [{ to: '/classrooms', label: 'Turmas', icon: 'groups' }] : []),
+    // Alunos não têm disciplinas — o link para o próprio perfil se chama "Meu Perfil"
+    // para qualquer papel, em vez de prometer "Minhas Disciplinas" e não entregar.
     ...(user && user.role !== 'ADMIN'
-      ? [
-          {
-            to: `/profile/${user.username}`,
-            label: user.role === 'TEACHER' ? 'Meu Perfil' : 'Minhas Disciplinas',
-            icon: user.role === 'TEACHER' ? 'person' : 'menu_book',
-          },
-        ]
+      ? [{ to: `/profile/${user.username}`, label: 'Meu Perfil', icon: 'person' }]
       : []),
   ]
 
-  const roleLabel = user?.role === 'ADMIN' ? 'Administrador' : user?.role === 'TEACHER' ? 'Professor' : 'Aluno'
+  const roleLabel = user ? ROLE_LABELS[user.role] : ''
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -86,11 +77,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   </span>
                 </div>
                 <div className="w-9 h-9 rounded-full bg-primary-container flex items-center justify-center">
-                  <span
-                    className="material-symbols-outlined text-on-primary-container"
-                    style={{ fontSize: 20, fontVariationSettings: "'FILL' 1" }}
-                  >
-                    person
+                  <span className="text-label-lg text-on-primary-container font-bold leading-none">
+                    {user.username.trim().charAt(0).toUpperCase() || '?'}
                   </span>
                 </div>
                 <button
@@ -116,7 +104,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <button
               onClick={() => setMenuOpen((open) => !open)}
               className="md:hidden w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-low transition-colors"
-              aria-label="Abrir menu"
+              aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
               aria-expanded={menuOpen}
             >
               <span className="material-symbols-outlined" style={{ fontSize: 24 }}>

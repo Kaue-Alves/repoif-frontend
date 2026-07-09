@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
+import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
+import { useToast } from '../../contexts/ToastContext'
+import { useNow } from '../../hooks/useNow'
+import { clientPageMeta } from '../../utils/pagination'
 import { formatFileSize } from './subjects.service'
 import {
   createAssignment,
@@ -19,13 +23,23 @@ import {
 
 type Item = TeacherAssignmentItem | StudentAssignmentItem
 
+const ASSIGNMENTS_PAGE_LIMIT = 10
+
 export default function AssignmentsTab({ subjectId, isOwner }: { subjectId: string; isOwner: boolean }) {
+  const showToast = useToast()
+  const now = useNow()
   const [items, setItems] = useState<Item[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [deleteTarget, setDeleteTarget] = useState<Assignment | null>(null)
   const [deleting, setDeleting] = useState(false)
+  const [page, setPage] = useState(1)
+
+  // Paginação client-side: a API devolve a lista inteira de trabalhos.
+  const totalPages = Math.max(1, Math.ceil(items.length / ASSIGNMENTS_PAGE_LIMIT))
+  const safePage = Math.min(page, totalPages)
+  const pagedItems = items.slice((safePage - 1) * ASSIGNMENTS_PAGE_LIMIT, safePage * ASSIGNMENTS_PAGE_LIMIT)
 
   useEffect(() => {
     load()
@@ -52,7 +66,7 @@ export default function AssignmentsTab({ subjectId, isOwner }: { subjectId: stri
       setItems((prev) => prev.filter((a) => a.id !== deleteTarget.id))
       setDeleteTarget(null)
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao excluir trabalho.')
+      showToast(err instanceof Error ? err.message : 'Erro ao excluir trabalho.')
     } finally {
       setDeleting(false)
     }
@@ -95,16 +109,25 @@ export default function AssignmentsTab({ subjectId, isOwner }: { subjectId: stri
       )}
 
       {!loading && items.length > 0 && (
-        <ul className="space-y-sm">
-          {items.map((a) => (
-            <AssignmentRow
-              key={a.id}
-              item={a}
-              isOwner={isOwner}
-              onDelete={() => setDeleteTarget(a)}
+        <>
+          <ul className="space-y-sm">
+            {pagedItems.map((a) => (
+              <AssignmentRow
+                key={a.id}
+                item={a}
+                isOwner={isOwner}
+                now={now}
+                onDelete={() => setDeleteTarget(a)}
+              />
+            ))}
+          </ul>
+          {items.length > ASSIGNMENTS_PAGE_LIMIT && (
+            <Pagination
+              meta={clientPageMeta(safePage, ASSIGNMENTS_PAGE_LIMIT, items.length)}
+              onPageChange={setPage}
             />
-          ))}
-        </ul>
+          )}
+        </>
       )}
 
       {isOwner && (
@@ -135,8 +158,18 @@ export default function AssignmentsTab({ subjectId, isOwner }: { subjectId: stri
 
 // ─── Assignment Row ───────────────────────────────────────────────────────────
 
-function AssignmentRow({ item, isOwner, onDelete }: { item: Item; isOwner: boolean; onDelete: () => void }) {
-  const past = isPastDue(item.dueDate)
+function AssignmentRow({
+  item,
+  isOwner,
+  now,
+  onDelete,
+}: {
+  item: Item
+  isOwner: boolean
+  now: number
+  onDelete: () => void
+}) {
+  const past = isPastDue(item.dueDate, now)
 
   return (
     <li className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-start gap-md hover:bg-surface-container-low transition-colors">
@@ -152,7 +185,7 @@ function AssignmentRow({ item, isOwner, onDelete }: { item: Item; isOwner: boole
           <Link to={`/assignments/${item.id}`} className="text-label-lg text-on-surface hover:text-primary transition-colors truncate">
             {item.title}
           </Link>
-          <StatusBadge item={item} isOwner={isOwner} />
+          <StatusBadge item={item} isOwner={isOwner} past={past} />
         </div>
 
         {item.description && (
@@ -197,7 +230,7 @@ function AssignmentRow({ item, isOwner, onDelete }: { item: Item; isOwner: boole
   )
 }
 
-function StatusBadge({ item, isOwner }: { item: Item; isOwner: boolean }) {
+function StatusBadge({ item, isOwner, past }: { item: Item; isOwner: boolean; past: boolean }) {
   if (isOwner) return null
   const student = item as StudentAssignmentItem
   if (student.submitted) {
@@ -205,6 +238,15 @@ function StatusBadge({ item, isOwner }: { item: Item; isOwner: boolean }) {
       <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-primary-container/30 text-primary">
         <span className="material-symbols-outlined" style={{ fontSize: 12 }}>check_circle</span>
         Entregue
+      </span>
+    )
+  }
+  // Após o prazo não há mais como entregar: "Pendente" sugeriria ação possível.
+  if (past) {
+    return (
+      <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-error-container text-on-error-container">
+        <span className="material-symbols-outlined" style={{ fontSize: 12 }}>event_busy</span>
+        Não entregue
       </span>
     )
   }

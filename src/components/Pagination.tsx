@@ -1,11 +1,6 @@
-export interface PageMeta {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
-}
+import type { PageMeta } from '../utils/pagination'
+
+export type { PageMeta } from '../utils/pagination'
 
 interface PaginationProps {
   meta: PageMeta

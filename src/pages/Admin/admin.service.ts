@@ -1,4 +1,5 @@
 import httpClient from '../../utils/httpClient'
+import type { Paginated } from '../../utils/pagination'
 import type {
   ReportReason,
   ReportStatus,
@@ -7,19 +8,7 @@ import type {
 
 // ─── Paginação ────────────────────────────────────────────────────────────────
 
-export interface PageMeta {
-  page: number
-  limit: number
-  total: number
-  totalPages: number
-  hasNextPage: boolean
-  hasPrevPage: boolean
-}
-
-export interface Paginated<T> {
-  data: T[]
-  meta: PageMeta
-}
+export type { PageMeta, Paginated } from '../../utils/pagination'
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
 

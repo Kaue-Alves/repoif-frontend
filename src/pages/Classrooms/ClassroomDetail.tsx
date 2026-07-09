@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import ConfirmModal from '../../components/ConfirmModal'
 import AppLayout from '../../components/layouts/AppLayout'
-import Pagination, { type PageMeta } from '../../components/Pagination'
+import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
+import { useToast } from '../../contexts/ToastContext'
+import { usePaginatedList } from '../../hooks/usePaginatedList'
 import { getSubjects, type Subject } from '../Dashboard/dashboard.service'
 import {
   acceptClassroomRequest,
@@ -34,7 +36,10 @@ export default function ClassroomDetail() {
   const [classroom, setClassroom] = useState<Classroom | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [tab, setTab] = useState<Tab>('subjects')
+  // A aba vive na URL: sobrevive a F5, é compartilhável e o voltar do navegador
+  // volta de aba em vez de sair da página.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const tab = (searchParams.get('tab') as Tab | null) ?? 'subjects'
 
   const isOwner = !!classroom && !!user && classroom.teacherId === user.sub
 
@@ -132,7 +137,7 @@ export default function ClassroomDetail() {
         {visibleTabs.map((t) => (
           <button
             key={t.key}
-            onClick={() => setTab(t.key)}
+            onClick={() => setSearchParams({ tab: t.key })}
             className={`flex items-center gap-xs px-md py-sm text-label-lg whitespace-nowrap border-b-2 -mb-px transition-colors ${
               activeTab === t.key
                 ? 'border-primary text-primary'
@@ -158,62 +163,37 @@ export default function ClassroomDetail() {
 const SUBJECTS_PAGE_LIMIT = 9
 
 function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: boolean }) {
-  const [subjects, setSubjects] = useState<ClassroomSubject[]>([])
-  const [meta, setMeta] = useState<PageMeta | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState('')
+  const showToast = useToast()
   const [addOpen, setAddOpen] = useState(false)
   const [removeTarget, setRemoveTarget] = useState<ClassroomSubject | null>(null)
   const [removing, setRemoving] = useState(false)
 
-  const [search, setSearch] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
-  const [page, setPage] = useState(1)
-  const [reloadKey, setReloadKey] = useState(0)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setActiveSearch(search.trim())
-      setPage(1)
-    }, 300)
-    return () => clearTimeout(timer)
-  }, [search])
-
-  useEffect(() => {
-    let cancelled = false
-    setLoading(true)
-    setError('')
-    getClassroomSubjects(classroomId, page, SUBJECTS_PAGE_LIMIT, activeSearch)
-      .then((res) => {
-        if (cancelled) return
-        setSubjects(res.data)
-        setMeta(res.meta)
-      })
-      .catch((err: unknown) => {
-        if (cancelled) return
-        setSubjects([])
-        setMeta(null)
-        setError(err instanceof Error ? err.message : 'Erro ao carregar disciplinas.')
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [classroomId, page, activeSearch, reloadKey])
+  const {
+    items: subjects,
+    meta,
+    loading,
+    error,
+    search,
+    setSearch,
+    activeSearch,
+    page,
+    setPage,
+    reload,
+    reloadAfterRemove,
+  } = usePaginatedList(
+    (page, limit, search) => getClassroomSubjects(classroomId, page, limit, search),
+    { limit: SUBJECTS_PAGE_LIMIT, deps: [classroomId] },
+  )
 
   async function handleRemove() {
     if (!removeTarget) return
     setRemoving(true)
     try {
       await removeClassroomSubject(classroomId, removeTarget.id)
-      const wasLastOnPage = subjects.length === 1
       setRemoveTarget(null)
-      if (wasLastOnPage && page > 1) setPage((p) => p - 1)
-      else setReloadKey((k) => k + 1)
+      reloadAfterRemove()
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao remover disciplina.')
+      showToast(err instanceof Error ? err.message : 'Erro ao remover disciplina.')
     } finally {
       setRemoving(false)
     }
@@ -233,7 +213,18 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
         </div>
       )}
 
-      {error && !loading && <p className="text-body-md text-error text-center py-lg">{error}</p>}
+      {error && !loading && (
+        <div
+          role="alert"
+          className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg"
+        >
+          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+          {error}
+          <button onClick={reload} className="ml-auto text-label-lg underline hover:no-underline">
+            Tentar novamente
+          </button>
+        </div>
+      )}
 
       {/* Empty: nenhuma disciplina e sem busca ativa */}
       {!loading && !error && subjects.length === 0 && !activeSearch && (
@@ -329,11 +320,10 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
         <AddSubjectModal
           open={addOpen}
           classroomId={classroomId}
-          linkedIds={subjects.map((s) => s.id)}
           onClose={() => setAddOpen(false)}
           onAdded={() => {
             setAddOpen(false)
-            setReloadKey((k) => k + 1)
+            reload()
           }}
         />
       )}
@@ -355,19 +345,19 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
 function AddSubjectModal({
   open,
   classroomId,
-  linkedIds,
   onClose,
   onAdded,
 }: {
   open: boolean
   classroomId: string
-  linkedIds: string[]
   onClose: () => void
   onAdded: (s: ClassroomSubject) => void
 }) {
   const [mode, setMode] = useState<'existing' | 'new'>('existing')
   const [mySubjects, setMySubjects] = useState<Subject[]>([])
   const [loadingSubjects, setLoadingSubjects] = useState(false)
+  const [subjectsError, setSubjectsError] = useState('')
+  const [subjectsReload, setSubjectsReload] = useState(0)
   const [selectedId, setSelectedId] = useState('')
   const [name, setName] = useState('')
   const [description, setDescription] = useState('')
@@ -376,17 +366,39 @@ function AddSubjectModal({
 
   useEffect(() => {
     if (!open) return
-    setMode('existing')
     setSelectedId('')
-    setName('')
-    setDescription('')
-    setError('')
+    setSubjectsError('')
     setLoadingSubjects(true)
-    getSubjects()
-      .then((data) => setMySubjects(data.filter((s) => !linkedIds.includes(s.id))))
-      .catch(() => setMySubjects([]))
-      .finally(() => setLoadingSubjects(false))
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false
+    // Busca TODOS os vínculos da turma (não só a página visível) para não oferecer
+    // no select disciplinas que já estão vinculadas. Falha vira erro visível — uma
+    // lista vazia aqui induziria o professor a recriar uma disciplina que já existe.
+    Promise.all([getSubjects(), getClassroomSubjects(classroomId, 1, 100)])
+      .then(([mine, linked]) => {
+        if (cancelled) return
+        const linkedIds = new Set(linked.data.map((s) => s.id))
+        setMySubjects(mine.filter((s) => !linkedIds.has(s.id)))
+      })
+      .catch((err: unknown) => {
+        if (cancelled) return
+        setMySubjects([])
+        setSubjectsError(err instanceof Error ? err.message : 'Erro ao carregar suas disciplinas.')
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingSubjects(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [open, classroomId, subjectsReload])
+
+  useEffect(() => {
+    if (open) {
+      setMode('existing')
+      setName('')
+      setDescription('')
+      setError('')
+    }
   }, [open])
 
   if (!open) return null
@@ -470,6 +482,18 @@ function AddSubjectModal({
               <div className="flex items-center gap-sm text-on-surface-variant py-sm">
                 <Spinner className="h-4 w-4" /> Carregando...
               </div>
+            ) : subjectsError ? (
+              <div role="alert" className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
+                <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+                {subjectsError}
+                <button
+                  type="button"
+                  onClick={() => setSubjectsReload((k) => k + 1)}
+                  className="ml-auto text-label-lg underline hover:no-underline"
+                >
+                  Tentar novamente
+                </button>
+              </div>
             ) : mySubjects.length === 0 ? (
               <p className="text-body-md text-on-surface-variant py-sm">
                 Nenhuma disciplina disponível para vincular. Use "Criar nova".
@@ -539,6 +563,7 @@ function AddSubjectModal({
 // ─── Tab: Alunos ────────────────────────────────────────────────────────────────
 
 function MembersTab({ classroomId }: { classroomId: string }) {
+  const showToast = useToast()
   const [members, setMembers] = useState<ClassroomMember[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -592,7 +617,7 @@ function MembersTab({ classroomId }: { classroomId: string }) {
       setMembers((prev) => prev.filter((m) => m.studentId !== removeTarget.studentId))
       setRemoveTarget(null)
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao remover aluno.')
+      showToast(err instanceof Error ? err.message : 'Erro ao remover aluno.')
     } finally {
       setRemoving(false)
     }
@@ -674,6 +699,12 @@ function MembersTab({ classroomId }: { classroomId: string }) {
                 <p className="text-label-lg text-on-surface truncate">@{m.username ?? '—'}</p>
                 {m.email && <p className="text-label-sm text-on-surface-variant truncate">{m.email}</p>}
               </div>
+              {m.status === 'PENDING' && (
+                <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-tertiary-fixed/30 text-tertiary flex-shrink-0">
+                  <span className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
+                  Pendente
+                </span>
+              )}
               <button
                 onClick={() => setRemoveTarget(m)}
                 title="Remover da turma"
@@ -703,6 +734,7 @@ function MembersTab({ classroomId }: { classroomId: string }) {
 // ─── Tab: Pedidos ────────────────────────────────────────────────────────────────
 
 function RequestsTab({ classroomId }: { classroomId: string }) {
+  const showToast = useToast()
   const [requests, setRequests] = useState<ClassroomMember[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -730,8 +762,9 @@ function RequestsTab({ classroomId }: { classroomId: string }) {
     try {
       await acceptClassroomRequest(classroomId, studentId)
       setRequests((prev) => prev.filter((r) => r.studentId !== studentId))
+      showToast('Aluno aceito na turma.', 'success')
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao aceitar pedido.')
+      showToast(err instanceof Error ? err.message : 'Erro ao aceitar pedido.')
     } finally {
       setBusyId(null)
     }
@@ -743,7 +776,7 @@ function RequestsTab({ classroomId }: { classroomId: string }) {
       await rejectClassroomRequest(classroomId, studentId)
       setRequests((prev) => prev.filter((r) => r.studentId !== studentId))
     } catch (err) {
-      alert(err instanceof Error ? err.message : 'Erro ao recusar pedido.')
+      showToast(err instanceof Error ? err.message : 'Erro ao recusar pedido.')
     } finally {
       setBusyId(null)
     }
@@ -870,8 +903,8 @@ function InviteTab({ classroomId }: { classroomId: string }) {
           <div>
             <h3 className="text-headline-sm text-on-surface">Link de convite</h3>
             <p className="text-body-md text-on-surface-variant mt-xs">
-              O link é válido por <strong>30 minutos</strong>. Ao entrar por ele, o aluno envia um pedido que você
-              precisa aceitar na aba <strong>Pedidos</strong>.
+              O link é temporário — o tempo restante aparece abaixo depois de gerá-lo. Ao entrar
+              por ele, o aluno envia um pedido que você precisa aceitar na aba <strong>Pedidos</strong>.
             </p>
           </div>
         </div>
