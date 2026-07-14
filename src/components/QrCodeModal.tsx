@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
+import QrFullscreenOverlay from './QrFullscreenOverlay'
 import Spinner from './Spinner'
 
 interface QrCodeModalProps {
@@ -21,11 +22,11 @@ export default function QrCodeModal({
 }: QrCodeModalProps) {
   const [fullscreen, setFullscreen] = useState(false)
 
+  // Em tela cheia quem trata o Esc é o overlay — aí Esc sai da tela cheia, não do modal.
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if (e.key !== 'Escape' || !open) return
-      if (fullscreen) setFullscreen(false)
-      else onClose()
+      if (e.key !== 'Escape' || !open || fullscreen) return
+      onClose()
     }
     document.addEventListener('keydown', handler)
     return () => document.removeEventListener('keydown', handler)
@@ -110,28 +111,8 @@ export default function QrCodeModal({
         </div>
       </div>
 
-      {/* Tela cheia */}
       {fullscreen && url && (
-        <div
-          className="absolute inset-0 z-10 bg-white flex flex-col items-center justify-center gap-lg p-lg"
-          onClick={() => setFullscreen(false)}
-        >
-          <QRCodeSVG
-            value={url}
-            level="M"
-            className="w-full h-auto max-w-[min(90vw,90vh)]"
-          />
-          <p className="text-body-md text-on-surface-variant text-center max-w-md truncate">
-            {fileName}
-          </p>
-          <button
-            onClick={(e) => { e.stopPropagation(); setFullscreen(false) }}
-            title="Sair da tela cheia"
-            className="absolute top-md right-md w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
-          >
-            <span className="material-symbols-outlined" style={{ fontSize: 24 }}>fullscreen_exit</span>
-          </button>
-        </div>
+        <QrFullscreenOverlay url={url} caption={fileName} onClose={() => setFullscreen(false)} />
       )}
     </div>
   )

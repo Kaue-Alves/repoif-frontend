@@ -127,7 +127,7 @@ export async function uploadAssignmentAttachment(
   const contentType = file.type || 'application/octet-stream'
   const { data: presigned } = await httpClient.post<{ uploadUrl: string; key: string }>(
     '/assignments/attachment/upload-url',
-    { filename: file.name, contentType },
+    { filename: file.name, contentType, size: file.size },
   )
   await uploadToR2(presigned.uploadUrl, file, onProgress)
   return {
@@ -183,7 +183,7 @@ export async function submitAssignment(
   const contentType = file.type || 'application/octet-stream'
   const { data: presigned } = await httpClient.post<{ uploadUrl: string; key: string }>(
     `/assignments/${assignmentId}/submission/upload-url`,
-    { filename: file.name, contentType },
+    { filename: file.name, contentType, size: file.size },
   )
 
   await uploadToR2(presigned.uploadUrl, file, onProgress)

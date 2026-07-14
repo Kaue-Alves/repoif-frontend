@@ -32,11 +32,15 @@ export interface FileRecord {
   isPublic: boolean
   createdAt: string
   updatedAt: string
+  /** Preenchido quando o arquivo está desabilitado. Só o dono recebe esse campo. */
+  deletedAt?: string | null
 }
 
 export interface UploadUrlRequest {
   filename: string
   contentType: string
+  /** Tamanho em bytes. Vira ContentLength na URL assinada; o backend rejeita se > 200 MB. */
+  size: number
   subjectId: string
   isPublic: boolean
 }
@@ -75,8 +79,13 @@ export async function updateSubject(id: string, body: Partial<SubjectBody>): Pro
 
 // ─── Files ────────────────────────────────────────────────────────────────────
 
-export async function getSubjectFiles(subjectId: string): Promise<FileRecord[]> {
-  const { data } = await httpClient.get<FileRecord[]>(`/files/subject/${subjectId}`)
+/** `search` filtra pelo nome do arquivo. O backend aplica o filtro depois do recorte
+ *  de visibilidade — buscar nunca revela um privado que a listagem esconderia. */
+export async function getSubjectFiles(subjectId: string, search?: string): Promise<FileRecord[]> {
+  const term = search?.trim()
+  const { data } = await httpClient.get<FileRecord[]>(`/files/subject/${subjectId}`, {
+    params: term ? { search: term } : undefined,
+  })
   return data
 }
 
@@ -103,6 +112,18 @@ export async function patchFile(
   return data
 }
 
+/** Desabilita (exclusão lógica): some para os alunos, mas o dono pode reabilitar. */
+export async function disableFile(fileId: string): Promise<FileRecord> {
+  const { data } = await httpClient.patch<FileRecord>(`/files/${fileId}/disable`)
+  return data
+}
+
+export async function enableFile(fileId: string): Promise<FileRecord> {
+  const { data } = await httpClient.patch<FileRecord>(`/files/${fileId}/enable`)
+  return data
+}
+
+/** Exclusão definitiva: apaga o objeto no R2 e o registro. Não tem volta. */
 export async function deleteFile(fileId: string): Promise<void> {
   await httpClient.delete(`/files/${fileId}`)
 }
@@ -130,11 +151,7 @@ export function uploadToR2(uploadUrl: string, file: File, onProgress: (pct: numb
 
 // ─── Utilitários de exibição ──────────────────────────────────────────────────
 
-export function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
+export { formatFileSize } from '../../utils/format'
 
 export function getMimeIcon(mimeType: string): string {
   if (mimeType.includes('pdf')) return 'picture_as_pdf'

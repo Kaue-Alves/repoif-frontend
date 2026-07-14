@@ -1,6 +1,8 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import BackLink from '../../components/BackLink'
 import ConfirmModal from '../../components/ConfirmModal'
+import FileDropZone from '../../components/FileDropZone'
 import Pagination from '../../components/Pagination'
 import QrCodeModal from '../../components/QrCodeModal'
 import ReportModal from '../../components/ReportModal'
@@ -9,12 +11,15 @@ import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
 import { useToast } from '../../contexts/ToastContext'
 import { clientPageMeta } from '../../utils/pagination'
+import { UPLOAD_HINT } from '../../utils/uploadPolicy'
 import AssignmentsTab from './AssignmentsTab'
 import {
   type FileRecord,
   type SubjectWithTeacher,
   confirmUpload,
   deleteFile,
+  disableFile,
+  enableFile,
   formatDate,
   formatFileSize,
   getDownloadUrl,
@@ -60,7 +65,11 @@ export default function SubjectDetail() {
   const [filesPage, setFilesPage] = useState(1)
   const [pageError, setPageError] = useState('')
 
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  // `fileSearch` é o que o usuário digita; `activeFileSearch` é o termo já debounced
+  // que foi de fato para a API. Separá-los evita uma requisição por tecla.
+  const [fileSearch, setFileSearch] = useState('')
+  const [activeFileSearch, setActiveFileSearch] = useState('')
+
   const [uploadStep, setUploadStep] = useState<UploadStep>('idle')
   const [pending, setPending] = useState<PendingUpload | null>(null)
   const [uploadProgress, setUploadProgress] = useState(0)
@@ -122,12 +131,22 @@ export default function SubjectDetail() {
     }
   }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Debounce da busca. Voltar para a página 1 é obrigatório: com o filtro novo a lista
+  // encolhe, e ficar na página 5 mostraria um vazio que parece "nenhum resultado".
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setActiveFileSearch(fileSearch.trim())
+      setFilesPage(1)
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [fileSearch])
+
   useEffect(() => {
     if (!id) return
     let cancelled = false
     setLoadingFiles(true)
     setFilesError('')
-    getSubjectFiles(id)
+    getSubjectFiles(id, activeFileSearch)
       .then((data) => {
         if (!cancelled) setFiles(data)
       })
@@ -143,12 +162,9 @@ export default function SubjectDetail() {
     return () => {
       cancelled = true
     }
-  }, [id, filesReload])
+  }, [id, filesReload, activeFileSearch])
 
-  function onFilesPicked(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    e.target.value = ''
+  function onFilePicked(file: File) {
     setPending({ file, isPublic: uploadPublic })
     setUploadStep('picking')
     setUploadError('')
@@ -164,13 +180,14 @@ export default function SubjectDetail() {
       const { uploadUrl, key } = await requestUploadUrl({
         filename: pending.file.name,
         contentType: pending.file.type || 'application/octet-stream',
+        size: pending.file.size,
         subjectId: id,
         isPublic: pending.isPublic,
       })
 
       await uploadToR2(uploadUrl, pending.file, setUploadProgress)
 
-      const record = await confirmUpload({
+      await confirmUpload({
         key,
         originalName: pending.file.name,
         mimeType: pending.file.type || 'application/octet-stream',
@@ -179,7 +196,9 @@ export default function SubjectDetail() {
         isPublic: pending.isPublic,
       })
 
-      setFiles((prev) => [record, ...prev])
+      // Recarrega em vez de prepender: com um filtro de busca ativo, inserir o arquivo
+      // à força mostraria um item que não casa com o termo digitado.
+      setFilesReload((k) => k + 1)
       setUploadStep('done')
       setPending(null)
     } catch (err) {
@@ -273,6 +292,22 @@ export default function SubjectDetail() {
     }
   }
 
+  async function handleToggleEnabled(file: FileRecord) {
+    setTogglingIds((s) => new Set(s).add(file.id))
+    try {
+      const updated = file.deletedAt ? await enableFile(file.id) : await disableFile(file.id)
+      setFiles((prev) => prev.map((f) => (f.id === updated.id ? updated : f)))
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : 'Erro ao atualizar o arquivo.')
+    } finally {
+      setTogglingIds((s) => {
+        const next = new Set(s)
+        next.delete(file.id)
+        return next
+      })
+    }
+  }
+
   async function saveRename() {
     if (!rename) return
     const trimmed = rename.value.trim()
@@ -335,18 +370,26 @@ export default function SubjectDetail() {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-xl">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-xs text-label-sm text-on-surface-variant">
-          {user?.role === 'TEACHER' && user.username === subject.teacherUsername ? (
-            <Link to="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
-          ) : (
-            <Link to={`/profile/${subject.teacherUsername}`} className="hover:text-primary transition-colors">
-              @{subject.teacherUsername}
-            </Link>
-          )}
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
-          <span className="text-on-surface truncate max-w-xs">{subject.name}</span>
-        </nav>
+        <div className="flex flex-col gap-sm">
+          <BackLink
+            fallbackTo={isOwner ? '/dashboard' : `/profile/${subject.teacherUsername}`}
+            fallbackLabel={isOwner ? 'Dashboard' : `@${subject.teacherUsername}`}
+            className="self-start"
+          />
+
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-xs text-label-sm text-on-surface-variant">
+            {user?.role === 'TEACHER' && user.username === subject.teacherUsername ? (
+              <Link to="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
+            ) : (
+              <Link to={`/profile/${subject.teacherUsername}`} className="hover:text-primary transition-colors">
+                @{subject.teacherUsername}
+              </Link>
+            )}
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
+            <span className="text-on-surface truncate max-w-xs">{subject.name}</span>
+          </nav>
+        </div>
 
         {/* Subject header */}
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg flex items-start justify-between gap-md">
@@ -439,22 +482,22 @@ export default function SubjectDetail() {
                   })}
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full border-2 border-dashed border-outline-variant rounded-xl py-xl text-center hover:border-primary hover:bg-primary-container/5 transition-all group"
-                >
-                  <span
-                    className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors"
-                    style={{ fontSize: 40 }}
+                <FileDropZone
+                  onFile={onFilePicked}
+                  onReject={setUploadError}
+                  label="Clique para selecionar ou arraste um arquivo aqui"
+                  hint={UPLOAD_HINT}
+                />
+
+                {uploadError && (
+                  <div
+                    role="alert"
+                    className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md"
                   >
-                    cloud_upload
-                  </span>
-                  <p className="text-body-md text-on-surface-variant mt-sm group-hover:text-primary transition-colors">
-                    Clique para selecionar um arquivo
-                  </p>
-                </button>
-                <input ref={fileInputRef} type="file" className="hidden" onChange={onFilesPicked} />
+                    <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+                    {uploadError}
+                  </div>
+                )}
               </div>
             )}
 
@@ -569,10 +612,35 @@ export default function SubjectDetail() {
           <h2 className="text-headline-sm text-on-surface flex items-center gap-sm">
             <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>folder_open</span>
             Materiais de aula
-            {!loadingFiles && (
+            {!loadingFiles && !filesError && (
               <span className="text-label-sm text-on-surface-variant font-normal">({files.length})</span>
             )}
           </h2>
+
+          {/* O campo some quando a disciplina não tem arquivo nenhum: não há o que filtrar. */}
+          {(files.length > 0 || activeFileSearch) && !filesError && (
+            <div className="relative max-w-md">
+              <span
+                className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+                style={{ fontSize: 20 }}
+              >
+                search
+              </span>
+              <input
+                type="search"
+                value={fileSearch}
+                onChange={(e) => setFileSearch(e.target.value)}
+                placeholder="Buscar arquivos pelo nome..."
+                aria-label="Buscar arquivos pelo nome"
+                className="w-full pl-[44px] pr-[44px] py-sm bg-surface-container-lowest border border-outline-variant rounded-xl text-body-md text-on-surface placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+              />
+              {loadingFiles && (
+                <span className="absolute right-md top-1/2 -translate-y-1/2">
+                  <Spinner className="h-5 w-5 text-primary" />
+                </span>
+              )}
+            </div>
+          )}
 
           {loadingFiles ? (
             <div className="flex justify-center py-xl">
@@ -592,19 +660,31 @@ export default function SubjectDetail() {
                 Tentar novamente
               </button>
             </div>
+          ) : files.length === 0 && activeFileSearch ? (
+            <p className="text-center text-body-md text-on-surface-variant py-xl">
+              Nenhum arquivo encontrado para "{activeFileSearch}".
+            </p>
           ) : files.length === 0 ? (
             <div className="flex flex-col items-center gap-md py-xl text-center border-2 border-dashed border-outline-variant rounded-xl">
               <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48 }}>
                 folder_open
               </span>
-              <p className="text-body-md text-on-surface-variant">Nenhum arquivo enviado ainda.</p>
+              <p className="text-body-md text-on-surface-variant">
+                {isOwner ? 'Nenhum arquivo enviado ainda.' : 'Nenhum material disponível ainda.'}
+              </p>
             </div>
           ) : (
             <ul className="space-y-sm">
-              {pagedFiles.map((file) => (
+              {pagedFiles.map((file) => {
+                const disabled = !!file.deletedAt
+                return (
                 <li
                   key={file.id}
-                  className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-md hover:bg-surface-container-low transition-colors"
+                  className={`bg-surface-container-lowest border rounded-xl p-md flex items-center gap-md transition-colors ${
+                    disabled
+                      ? 'border-dashed border-outline-variant/70 opacity-60'
+                      : 'border-outline-variant hover:bg-surface-container-low'
+                  }`}
                 >
                   <span
                     className="material-symbols-outlined text-primary flex-shrink-0"
@@ -654,6 +734,12 @@ export default function SubjectDetail() {
                         </span>
                         {' '}{file.isPublic ? 'Público' : 'Privado'}
                       </span>
+                      {disabled && (
+                        <span className="flex items-center gap-xs px-xs rounded text-label-sm text-error">
+                          <span className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>visibility_off</span>
+                          Desabilitado
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -674,7 +760,9 @@ export default function SubjectDetail() {
                       <span className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
                     </button>
 
-                    {user?.role !== 'STUDENT' && (
+                    {/* Arquivo privado só o dono compartilha — para os demais o backend
+                        recusaria a URL de download e o QR viria vazio. */}
+                    {(isOwner || file.isPublic) && (
                       <button
                         onClick={() => handleShowQr(file)}
                         title="Compartilhar via QR code"
@@ -696,37 +784,55 @@ export default function SubjectDetail() {
 
                     {isOwner && (
                       <>
+                        {/* Visibilidade e renomear só fazem sentido num arquivo ativo. */}
+                        {!disabled && (
+                          <>
+                            <button
+                              onClick={() => handleToggleVisibility(file)}
+                              disabled={togglingIds.has(file.id)}
+                              title={file.isPublic ? 'Tornar privado' : 'Tornar público'}
+                              className="w-9 h-9 flex items-center justify-center rounded-lg text-action-visibility hover:bg-surface-container-high transition-all disabled:opacity-40"
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                                {file.isPublic ? 'lock' : 'public'}
+                              </span>
+                            </button>
+
+                            <button
+                              onClick={() => setRename({ id: file.id, value: file.originalName })}
+                              title="Renomear"
+                              className="w-9 h-9 flex items-center justify-center rounded-lg text-action-rename hover:bg-surface-container-high transition-all"
+                            >
+                              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
+                            </button>
+                          </>
+                        )}
+
+                        {/* Desabilitar (reversível) vs. reabilitar. */}
                         <button
-                          onClick={() => handleToggleVisibility(file)}
+                          onClick={() => handleToggleEnabled(file)}
                           disabled={togglingIds.has(file.id)}
-                          title={file.isPublic ? 'Tornar privado' : 'Tornar público'}
+                          title={disabled ? 'Reabilitar (voltar a exibir para os alunos)' : 'Desabilitar (ocultar dos alunos)'}
                           className="w-9 h-9 flex items-center justify-center rounded-lg text-action-visibility hover:bg-surface-container-high transition-all disabled:opacity-40"
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
-                            {file.isPublic ? 'lock' : 'public'}
+                            {disabled ? 'toggle_on' : 'toggle_off'}
                           </span>
                         </button>
 
                         <button
-                          onClick={() => setRename({ id: file.id, value: file.originalName })}
-                          title="Renomear"
-                          className="w-9 h-9 flex items-center justify-center rounded-lg text-action-rename hover:bg-surface-container-high transition-all"
-                        >
-                          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
-                        </button>
-
-                        <button
                           onClick={() => setDeleteTarget(file)}
-                          title="Excluir"
+                          title="Excluir definitivamente"
                           className="w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all"
                         >
-                          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+                          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete_forever</span>
                         </button>
                       </>
                     )}
                   </div>
                 </li>
-              ))}
+                )
+              })}
             </ul>
           )}
 
@@ -742,8 +848,8 @@ export default function SubjectDetail() {
 
       <ConfirmModal
         open={!!deleteTarget}
-        title="Excluir arquivo?"
-        description={`"${deleteTarget?.originalName}" será removido permanentemente.`}
+        title="Excluir arquivo definitivamente?"
+        description={`"${deleteTarget?.originalName}" será apagado do armazenamento e não poderá ser recuperado. Para apenas ocultá-lo dos alunos, use "Desabilitar".`}
         confirmLabel="Excluir"
         danger
         loading={deleting}

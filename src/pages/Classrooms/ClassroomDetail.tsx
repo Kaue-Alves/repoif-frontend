@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import { QRCodeSVG } from 'qrcode.react'
+import BackLink from '../../components/BackLink'
 import ConfirmModal from '../../components/ConfirmModal'
+import QrFullscreenOverlay from '../../components/QrFullscreenOverlay'
 import AppLayout from '../../components/layouts/AppLayout'
 import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
@@ -14,10 +16,12 @@ import {
   addClassroomMember,
   addClassroomSubject,
   createClassroomInvite,
+  DEFAULT_INVITE_TTL_MINUTES,
   getClassroom,
   getClassroomMembers,
   getClassroomRequests,
   getClassroomSubjects,
+  INVITE_TTL_OPTIONS,
   rejectClassroomRequest,
   removeClassroomMember,
   removeClassroomSubject,
@@ -98,13 +102,7 @@ export default function ClassroomDetail() {
     <AppLayout>
       {/* Header */}
       <div className="mb-lg">
-        <Link
-          to="/classrooms"
-          className="inline-flex items-center gap-xs text-label-lg text-on-surface-variant hover:text-on-surface transition-colors mb-md"
-        >
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>
-          Turmas
-        </Link>
+        <BackLink fallbackTo="/classrooms" fallbackLabel="Turmas" className="mb-md" />
         <div className="flex items-start gap-md">
           <div className="w-14 h-14 rounded-2xl bg-primary-container flex items-center justify-center flex-shrink-0">
             <span
@@ -273,7 +271,13 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
                     key={subject.id}
                     className="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden"
                   >
-                    <div className="absolute left-0 top-0 w-1 h-full bg-primary" />
+                    {/* Clicar no card equivale a "Arquivos". */}
+                    <Link
+                      to={`/subjects/${subject.id}`}
+                      aria-label={`Abrir arquivos de ${subject.name}`}
+                      className="absolute inset-0 rounded-xl focus-visible:ring-2 focus-visible:ring-primary"
+                    />
+                    <div className="absolute left-0 top-0 w-1 h-full bg-primary pointer-events-none" />
                     <div className="flex items-start justify-between mb-md pl-xs">
                       <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center">
                         <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
@@ -284,7 +288,7 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
                         <button
                           onClick={() => setRemoveTarget(subject)}
                           title="Remover da turma"
-                          className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors"
+                          className="relative z-10 w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors"
                         >
                           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
                         </button>
@@ -297,7 +301,7 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
                     <div className="flex mt-lg pt-md border-t border-outline-variant pl-xs">
                       <Link
                         to={`/subjects/${subject.id}`}
-                        className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+                        className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
                       >
                         <span className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
                         {isOwner ? 'Arquivos' : 'Ver arquivos'}
@@ -843,24 +847,33 @@ function RequestsTab({ classroomId }: { classroomId: string }) {
 
 // ─── Tab: Convidar ───────────────────────────────────────────────────────────────
 
+/** "6h 04min", "2d 3h", "45min 09s" — a unidade menor some quando não importa mais. */
+function formatRemaining(ms: number): string {
+  const totalSec = Math.floor(ms / 1000)
+  const days = Math.floor(totalSec / 86400)
+  const hours = Math.floor((totalSec % 86400) / 3600)
+  const min = Math.floor((totalSec % 3600) / 60)
+  const sec = totalSec % 60
+
+  if (days > 0) return `${days}d ${hours}h`
+  if (hours > 0) return `${hours}h ${String(min).padStart(2, '0')}min`
+  return `${min}min ${String(sec).padStart(2, '0')}s`
+}
+
 function InviteTab({ classroomId }: { classroomId: string }) {
   const [invite, setInvite] = useState<ClassroomInvite | null>(null)
+  const [ttlMinutes, setTtlMinutes] = useState(DEFAULT_INVITE_TTL_MINUTES)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [remaining, setRemaining] = useState('')
+  const [fullscreen, setFullscreen] = useState(false)
 
   useEffect(() => {
     if (!invite) return
     const tick = () => {
       const ms = new Date(invite.expiresAt).getTime() - Date.now()
-      if (ms <= 0) {
-        setRemaining('expirado')
-        return
-      }
-      const min = Math.floor(ms / 60000)
-      const sec = Math.floor((ms % 60000) / 1000)
-      setRemaining(`${min}min ${String(sec).padStart(2, '0')}s`)
+      setRemaining(ms <= 0 ? 'expirado' : formatRemaining(ms))
     }
     tick()
     const timer = setInterval(tick, 1000)
@@ -871,8 +884,9 @@ function InviteTab({ classroomId }: { classroomId: string }) {
     setLoading(true)
     setError('')
     setCopied(false)
+    setFullscreen(false)
     try {
-      setInvite(await createClassroomInvite(classroomId))
+      setInvite(await createClassroomInvite(classroomId, ttlMinutes))
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro ao gerar convite.')
     } finally {
@@ -903,13 +917,27 @@ function InviteTab({ classroomId }: { classroomId: string }) {
           <div>
             <h3 className="text-headline-sm text-on-surface">Link de convite</h3>
             <p className="text-body-md text-on-surface-variant mt-xs">
-              O link é temporário — o tempo restante aparece abaixo depois de gerá-lo. Ao entrar
+              O link é temporário — escolha por quanto tempo ele vale. Ao entrar
               por ele, o aluno envia um pedido que você precisa aceitar na aba <strong>Pedidos</strong>.
             </p>
           </div>
         </div>
 
         {error && <p className="text-body-md text-error mb-md">{error}</p>}
+
+        <label className="flex flex-col gap-xs mb-md max-w-xs">
+          <span className="text-label-lg text-on-surface-variant">Validade do link</span>
+          <select
+            value={ttlMinutes}
+            onChange={(e) => setTtlMinutes(Number(e.target.value))}
+            disabled={loading}
+            className="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-lg text-body-lg text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all disabled:opacity-60"
+          >
+            {INVITE_TTL_OPTIONS.map((opt) => (
+              <option key={opt.minutes} value={opt.minutes}>{opt.label}</option>
+            ))}
+          </select>
+        </label>
 
         {!invite ? (
           <button
@@ -947,9 +975,20 @@ function InviteTab({ classroomId }: { classroomId: string }) {
 
             {!expired && (
               <div className="flex flex-col items-center gap-sm pt-sm">
-                <div className="bg-white p-md rounded-xl">
+                <button
+                  onClick={() => setFullscreen(true)}
+                  title="Ampliar para tela cheia"
+                  className="bg-white p-md rounded-xl hover:opacity-90 transition-all"
+                >
                   <QRCodeSVG value={invite.inviteUrl} size={160} level="M" />
-                </div>
+                </button>
+                <button
+                  onClick={() => setFullscreen(true)}
+                  className="flex items-center gap-xs text-label-lg text-primary hover:underline"
+                >
+                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>fullscreen</span>
+                  Exibir em tela cheia
+                </button>
                 <p className="text-label-sm text-on-surface-variant">Ou escaneie o QR code para entrar.</p>
               </div>
             )}
@@ -965,6 +1004,14 @@ function InviteTab({ classroomId }: { classroomId: string }) {
           </div>
         )}
       </div>
+
+      {fullscreen && invite && !expired && (
+        <QrFullscreenOverlay
+          url={invite.inviteUrl}
+          caption={`Expira em ${remaining}`}
+          onClose={() => setFullscreen(false)}
+        />
+      )}
     </div>
   )
 }

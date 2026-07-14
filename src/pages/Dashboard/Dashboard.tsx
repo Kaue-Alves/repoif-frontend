@@ -185,8 +185,17 @@ interface SubjectCardProps {
 function SubjectCard({ subject, username, onEdit, onDelete }: SubjectCardProps) {
   return (
     <article className="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden">
+      {/* Clicar em qualquer ponto do card faz o mesmo que "Arquivos". Os botões da
+          barra de ações sobem de camada (z-10) para continuarem alcançáveis. */}
+      <Link
+        to={`/subjects/${subject.id}`}
+        state={{ subject: { ...subject, teacherUsername: username } }}
+        aria-label={`Abrir arquivos de ${subject.name}`}
+        className="absolute inset-0 rounded-xl focus-visible:ring-2 focus-visible:ring-primary"
+      />
+
       {/* Color accent bar */}
-      <div className={`absolute left-0 top-0 w-1 h-full ${subject.isPublic ? 'bg-primary' : 'bg-outline'}`} />
+      <div className={`absolute left-0 top-0 w-1 h-full pointer-events-none ${subject.isPublic ? 'bg-primary' : 'bg-outline'}`} />
 
       <div className="flex items-start justify-between mb-md pl-xs">
         <div
@@ -230,21 +239,21 @@ function SubjectCard({ subject, username, onEdit, onDelete }: SubjectCardProps) 
         <Link
           to={`/subjects/${subject.id}`}
           state={{ subject: { ...subject, teacherUsername: username } }}
-          className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+          className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
         >
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
           Arquivos
         </Link>
         <button
           onClick={onEdit}
-          className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-primary hover:bg-primary-container/20 transition-colors"
+          className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-primary hover:bg-primary-container/20 transition-colors"
         >
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
           Editar
         </button>
         <button
           onClick={onDelete}
-          className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-secondary hover:bg-error-container/30 transition-colors ml-auto"
+          className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-secondary hover:bg-error-container/30 transition-colors ml-auto"
         >
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
           Excluir

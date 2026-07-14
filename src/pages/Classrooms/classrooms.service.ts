@@ -136,8 +136,29 @@ export async function removeClassroomMember(classroomId: string, studentId: stri
 
 // ─── Convites e pedidos ────────────────────────────────────────────────────────
 
-export async function createClassroomInvite(classroomId: string): Promise<ClassroomInvite> {
-  const { data } = await httpClient.post<ClassroomInvite>(`/classrooms/${classroomId}/invites`)
+/**
+ * Validades aceitas pelo backend (`INVITE_TTL_OPTIONS_MINUTES`). Enviar um valor
+ * fora desta lista devolve 400.
+ */
+export const INVITE_TTL_OPTIONS: { minutes: number; label: string }[] = [
+  { minutes: 15, label: '15 minutos' },
+  { minutes: 30, label: '30 minutos' },
+  { minutes: 60, label: '1 hora' },
+  { minutes: 360, label: '6 horas' },
+  { minutes: 1440, label: '1 dia' },
+  { minutes: 10080, label: '7 dias' },
+]
+
+export const DEFAULT_INVITE_TTL_MINUTES = 30
+
+export async function createClassroomInvite(
+  classroomId: string,
+  expiresInMinutes: number = DEFAULT_INVITE_TTL_MINUTES,
+): Promise<ClassroomInvite> {
+  const { data } = await httpClient.post<ClassroomInvite>(
+    `/classrooms/${classroomId}/invites`,
+    { expiresInMinutes },
+  )
   return data
 }
 

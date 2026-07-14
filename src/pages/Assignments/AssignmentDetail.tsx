@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import BackLink from '../../components/BackLink'
 import ConfirmModal from '../../components/ConfirmModal'
+import FileDropZone from '../../components/FileDropZone'
+import { UPLOAD_HINT } from '../../utils/uploadPolicy'
 import AppLayout from '../../components/layouts/AppLayout'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
@@ -113,14 +116,22 @@ export default function AssignmentDetail() {
   return (
     <AppLayout>
       <div className="max-w-3xl mx-auto space-y-xl">
-        {/* Breadcrumb */}
-        <nav className="flex items-center gap-xs text-label-sm text-on-surface-variant">
-          <Link to={`/subjects/${assignment.subjectId}`} className="hover:text-primary transition-colors truncate">
-            {assignment.subjectName}
-          </Link>
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
-          <span className="text-on-surface truncate max-w-xs">{assignment.title}</span>
-        </nav>
+        <div className="flex flex-col gap-sm">
+          <BackLink
+            fallbackTo={`/subjects/${assignment.subjectId}?tab=assignments`}
+            fallbackLabel={assignment.subjectName}
+            className="self-start"
+          />
+
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-xs text-label-sm text-on-surface-variant">
+            <Link to={`/subjects/${assignment.subjectId}`} className="hover:text-primary transition-colors truncate">
+              {assignment.subjectName}
+            </Link>
+            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
+            <span className="text-on-surface truncate max-w-xs">{assignment.title}</span>
+          </nav>
+        </div>
 
         {/* Header */}
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
@@ -229,7 +240,6 @@ function StudentSubmission({
   onChanged: () => void
 }) {
   const showToast = useToast()
-  const fileInputRef = useRef<HTMLInputElement>(null)
   const [uploading, setUploading] = useState(false)
   const [progress, setProgress] = useState(0)
   const [error, setError] = useState('')
@@ -237,10 +247,8 @@ function StudentSubmission({
   const submission = assignment.mySubmission
   const canSubmit = assignment.canSubmit && !past
 
-  async function onFilePicked(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !assignment.id) return
-    e.target.value = ''
+  async function onFilePicked(file: File) {
+    if (!assignment.id) return
     setUploading(true)
     setProgress(0)
     setError('')
@@ -337,21 +345,16 @@ function StudentSubmission({
               <p className="text-label-sm text-on-surface-variant text-right">{progress}%</p>
             </div>
           ) : (
-            <>
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full border-2 border-dashed border-outline-variant rounded-xl py-xl text-center hover:border-primary hover:bg-primary-container/5 transition-all group"
-              >
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" style={{ fontSize: 40 }}>
-                  cloud_upload
-                </span>
-                <p className="text-body-md text-on-surface-variant mt-sm group-hover:text-primary transition-colors">
-                  {submission ? 'Selecionar novo arquivo para reenviar' : 'Clique para selecionar seu arquivo'}
-                </p>
-              </button>
-              <input ref={fileInputRef} type="file" className="hidden" onChange={onFilePicked} />
-            </>
+            <FileDropZone
+              onFile={onFilePicked}
+              onReject={setError}
+              label={
+                submission
+                  ? 'Clique ou arraste um novo arquivo para reenviar'
+                  : 'Clique para selecionar ou arraste seu arquivo aqui'
+              }
+              hint={UPLOAD_HINT}
+            />
           )}
         </div>
       )}

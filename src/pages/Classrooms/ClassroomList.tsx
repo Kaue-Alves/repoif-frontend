@@ -158,7 +158,6 @@ export default function ClassroomList() {
                     key={classroom.id}
                     classroom={classroom}
                     isTeacher={isTeacher}
-                    onOpen={() => navigate(`/classrooms/${classroom.id}`)}
                     onDelete={() => setDeleteTarget(classroom)}
                   />
                 ))}
@@ -201,14 +200,20 @@ export default function ClassroomList() {
 interface ClassroomCardProps {
   classroom: Classroom
   isTeacher: boolean
-  onOpen: () => void
   onDelete: () => void
 }
 
-function ClassroomCard({ classroom, isTeacher, onOpen, onDelete }: ClassroomCardProps) {
+function ClassroomCard({ classroom, isTeacher, onDelete }: ClassroomCardProps) {
   return (
     <article className="group bg-surface-container-lowest border border-outline-variant rounded-xl p-lg shadow-sm hover:shadow-md transition-all flex flex-col relative overflow-hidden">
-      <div className="absolute left-0 top-0 w-1 h-full bg-primary" />
+      {/* Clicar no card equivale a "Abrir turma". */}
+      <Link
+        to={`/classrooms/${classroom.id}`}
+        aria-label={`Abrir turma ${classroom.name}`}
+        className="absolute inset-0 rounded-xl focus-visible:ring-2 focus-visible:ring-primary"
+      />
+
+      <div className="absolute left-0 top-0 w-1 h-full bg-primary pointer-events-none" />
 
       <div className="flex items-start justify-between mb-md pl-xs">
         <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center">
@@ -222,11 +227,9 @@ function ClassroomCard({ classroom, isTeacher, onOpen, onDelete }: ClassroomCard
         </span>
       </div>
 
-      <button onClick={onOpen} className="text-left">
-        <h3 className="text-headline-sm text-on-surface mb-xs pl-xs group-hover:text-primary transition-colors line-clamp-2">
-          {classroom.name}
-        </h3>
-      </button>
+      <h3 className="text-headline-sm text-on-surface mb-xs pl-xs group-hover:text-primary transition-colors line-clamp-2">
+        {classroom.name}
+      </h3>
 
       {classroom.description && (
         <p className="text-body-md text-on-surface-variant pl-xs flex-1 line-clamp-3 mb-md">
@@ -237,7 +240,7 @@ function ClassroomCard({ classroom, isTeacher, onOpen, onDelete }: ClassroomCard
       <div className="flex flex-wrap items-center gap-sm mt-auto pt-md border-t border-outline-variant pl-xs">
         <Link
           to={`/classrooms/${classroom.id}`}
-          className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
+          className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
         >
           <span className="material-symbols-outlined" style={{ fontSize: 16 }}>meeting_room</span>
           Abrir turma
@@ -246,7 +249,7 @@ function ClassroomCard({ classroom, isTeacher, onOpen, onDelete }: ClassroomCard
         {isTeacher && (
           <button
             onClick={onDelete}
-            className="flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-secondary hover:bg-error-container/30 transition-colors"
+            className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-secondary hover:bg-error-container/30 transition-colors"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
             Excluir

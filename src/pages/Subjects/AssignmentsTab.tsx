@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ConfirmModal from '../../components/ConfirmModal'
+import FileDropZone from '../../components/FileDropZone'
 import Pagination from '../../components/Pagination'
 import Spinner from '../../components/Spinner'
 import { useToast } from '../../contexts/ToastContext'
@@ -172,7 +173,14 @@ function AssignmentRow({
   const past = isPastDue(item.dueDate, now)
 
   return (
-    <li className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-start gap-md hover:bg-surface-container-low transition-colors">
+    <li className="group relative bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-start gap-md hover:bg-surface-container-low transition-colors">
+      {/* Clicar na linha inteira abre o trabalho, como o botão da direita. */}
+      <Link
+        to={`/assignments/${item.id}`}
+        aria-label={`Abrir trabalho ${item.title}`}
+        className="absolute inset-0 rounded-xl focus-visible:ring-2 focus-visible:ring-primary"
+      />
+
       <span
         className="material-symbols-outlined text-primary flex-shrink-0 mt-xs"
         style={{ fontSize: 26, fontVariationSettings: "'FILL' 1" }}
@@ -182,9 +190,9 @@ function AssignmentRow({
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-sm flex-wrap">
-          <Link to={`/assignments/${item.id}`} className="text-label-lg text-on-surface hover:text-primary transition-colors truncate">
+          <span className="text-label-lg text-on-surface group-hover:text-primary transition-colors truncate">
             {item.title}
-          </Link>
+          </span>
           <StatusBadge item={item} isOwner={isOwner} past={past} />
         </div>
 
@@ -209,7 +217,7 @@ function AssignmentRow({
       <div className="flex items-center gap-xs flex-shrink-0">
         <Link
           to={`/assignments/${item.id}`}
-          className="flex items-center gap-xs px-md py-sm rounded-lg text-label-lg text-primary hover:bg-primary-container/20 transition-colors"
+          className="relative z-10 flex items-center gap-xs px-md py-sm rounded-lg text-label-lg text-primary hover:bg-primary-container/20 transition-colors"
         >
           <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
             {isOwner ? 'grading' : 'open_in_new'}
@@ -220,7 +228,7 @@ function AssignmentRow({
           <button
             onClick={onDelete}
             title="Excluir trabalho"
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all"
+            className="relative z-10 w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all"
           >
             <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
           </button>
@@ -278,7 +286,6 @@ function CreateAssignmentModal({
   const [progress, setProgress] = useState(0)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (open) {
@@ -398,25 +405,15 @@ function CreateAssignmentModal({
               </button>
             </div>
           ) : (
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex items-center justify-center gap-sm border-2 border-dashed border-outline-variant rounded-lg py-md text-label-lg text-on-surface-variant hover:border-primary hover:text-primary transition-all"
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>attach_file</span>
-              Anexar arquivo (ex: enunciado)
-            </button>
+            <FileDropZone
+              onFile={setFile}
+              onReject={setError}
+              label="Anexar arquivo (ex: enunciado) — clique ou arraste"
+              icon="attach_file"
+              size="compact"
+              disabled={saving}
+            />
           )}
-          <input
-            ref={fileInputRef}
-            type="file"
-            className="hidden"
-            onChange={(e) => {
-              const f = e.target.files?.[0]
-              e.target.value = ''
-              if (f) setFile(f)
-            }}
-          />
         </div>
 
         {saving && file && (
