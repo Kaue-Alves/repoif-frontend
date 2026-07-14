@@ -11,6 +11,7 @@ import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
 import { useToast } from '../../contexts/ToastContext'
 import { clientPageMeta } from '../../utils/pagination'
+import { CAN_SHARE_FILE_QR } from '../../utils/roles'
 import { UPLOAD_HINT } from '../../utils/uploadPolicy'
 import AssignmentsTab from './AssignmentsTab'
 import {
@@ -763,9 +764,11 @@ export default function SubjectDetail() {
                       <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
                     </button>
 
-                    {/* Arquivo privado só o dono compartilha — para os demais o backend
-                        recusaria a URL de download e o QR viria vazio. */}
-                    {(isOwner || file.isPublic) && (
+                    {/* O QR embute uma URL pré-assinada do R2, que dispensa login e turma:
+                        por isso o aluno nunca compartilha (CAN_SHARE_FILE_QR). E, entre quem
+                        pode, um arquivo privado só o dono compartilha — para os demais o
+                        backend recusaria a URL de download e o QR viria vazio. */}
+                    {user && CAN_SHARE_FILE_QR[user.role] && (isOwner || file.isPublic) && (
                       <button
                         onClick={() => handleShowQr(file)}
                         title="Compartilhar via QR code"

@@ -22,6 +22,21 @@ export const ROLE_BADGE_CLASSES: Record<UserRole, string> = {
   STUDENT: 'bg-tertiary-fixed/30 text-tertiary',
 }
 
+/**
+ * Quem pode compartilhar um arquivo por QR code.
+ *
+ * O QR embute uma URL pré-assinada do R2, que **não** passa pela autorização de
+ * download: quem recebe o código baixa o arquivo sem estar logado nem pertencer à
+ * turma. Isso é intencional para o professor divulgar um material, e é justamente
+ * por isso que o aluno não pode fazê-lo — seria uma porta para republicar material
+ * de aula fora da turma.
+ */
+export const CAN_SHARE_FILE_QR: Record<UserRole, boolean> = {
+  ADMIN: true,
+  TEACHER: true,
+  STUDENT: false,
+}
+
 /** Página inicial de cada papel. Login, RootRedirect e guards usam esta única regra. */
 export function homePathFor(user: Pick<AuthUser, 'role' | 'username'> | null): string {
   if (!user) return '/login'
