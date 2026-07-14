@@ -72,7 +72,7 @@ export default function ClassroomDetail() {
     return (
       <AppLayout>
         <div className="text-center py-xl">
-          <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>
+          <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>
             meeting_room
           </span>
           <h2 className="text-headline-sm text-on-surface mb-xs">Turma indisponível</h2>
@@ -81,7 +81,7 @@ export default function ClassroomDetail() {
             to="/classrooms"
             className="inline-flex items-center gap-sm text-label-lg text-primary hover:underline"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>
             Voltar para turmas
           </Link>
         </div>
@@ -105,7 +105,7 @@ export default function ClassroomDetail() {
         <BackLink fallbackTo="/classrooms" fallbackLabel="Turmas" className="mb-md" />
         <div className="flex items-start gap-md">
           <div className="w-14 h-14 rounded-2xl bg-primary-container flex items-center justify-center flex-shrink-0">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined text-on-primary-container"
               style={{ fontSize: 30, fontVariationSettings: "'FILL' 1" }}
             >
@@ -116,7 +116,7 @@ export default function ClassroomDetail() {
             <div className="flex flex-wrap items-center gap-sm">
               <h1 className="text-headline-lg text-on-surface">{classroom.name}</h1>
               <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-surface-container-high text-on-surface-variant">
-                <span className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
                 Privada
               </span>
             </div>
@@ -142,7 +142,7 @@ export default function ClassroomDetail() {
                 : 'border-transparent text-on-surface-variant hover:text-on-surface'
             }`}
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{t.icon}</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>{t.icon}</span>
             {t.label}
           </button>
         ))}
@@ -205,7 +205,7 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
             onClick={() => setAddOpen(true)}
             className="flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
             Adicionar disciplina
           </button>
         </div>
@@ -216,7 +216,7 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
           role="alert"
           className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg"
         >
-          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+          <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {error}
           <button onClick={reload} className="ml-auto text-label-lg underline hover:no-underline">
             Tentar novamente
@@ -227,7 +227,7 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
       {/* Empty: nenhuma disciplina e sem busca ativa */}
       {!loading && !error && subjects.length === 0 && !activeSearch && (
         <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
-          <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>menu_book</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>menu_book</span>
           <p className="text-body-md text-on-surface-variant">
             {isOwner ? 'Nenhuma disciplina vinculada a esta turma ainda.' : 'Nenhuma disciplina disponível ainda.'}
           </p>
@@ -238,13 +238,13 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
       {(subjects.length > 0 || activeSearch || (loading && page === 1)) && !error && (
         <>
           <div className="relative mb-lg max-w-md">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
               style={{ fontSize: 20 }}
             >
               search
             </span>
-            <input
+            <input aria-label="Buscar disciplinas pelo nome"
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -280,7 +280,7 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
                     <div className="absolute left-0 top-0 w-1 h-full bg-primary pointer-events-none" />
                     <div className="flex items-start justify-between mb-md pl-xs">
                       <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center">
-                        <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
                           menu_book
                         </span>
                       </div>
@@ -290,7 +290,7 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
                           title="Remover da turma"
                           className="relative z-10 w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors"
                         >
-                          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
+                          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
                         </button>
                       )}
                     </div>
@@ -303,7 +303,7 @@ function SubjectsTab({ classroomId, isOwner }: { classroomId: string; isOwner: b
                         to={`/subjects/${subject.id}`}
                         className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
                         {isOwner ? 'Arquivos' : 'Ver arquivos'}
                       </Link>
                     </div>
@@ -450,10 +450,10 @@ function AddSubjectModal({
           <h2 className="text-headline-sm text-on-surface">Adicionar disciplina</h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 
@@ -488,7 +488,7 @@ function AddSubjectModal({
               </div>
             ) : subjectsError ? (
               <div role="alert" className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-                <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+                <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
                 {subjectsError}
                 <button
                   type="button"
@@ -504,6 +504,7 @@ function AddSubjectModal({
               </p>
             ) : (
               <select
+                aria-label="Disciplina a vincular à turma"
                 value={selectedId}
                 onChange={(e) => setSelectedId(e.target.value)}
                 className="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-lg text-body-lg text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
@@ -544,7 +545,7 @@ function AddSubjectModal({
         <div className="flex gap-sm justify-end pt-xs">
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             disabled={saving}
             className="px-lg py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-lg hover:bg-surface-container-low transition-all disabled:opacity-60"
           >
@@ -654,6 +655,7 @@ function MembersTab({ classroomId }: { classroomId: string }) {
             </button>
           </div>
           <input
+            aria-label={addType === 'email' ? 'E-mail do aluno' : 'Nome de usuário do aluno'}
             value={addValue}
             onChange={(e) => setAddValue(e.target.value)}
             type={addType === 'email' ? 'email' : 'text'}
@@ -665,7 +667,7 @@ function MembersTab({ classroomId }: { classroomId: string }) {
             disabled={adding || !addValue.trim()}
             className="flex items-center justify-center gap-sm px-lg py-sm rounded-lg text-label-lg font-semibold bg-primary text-on-primary hover:opacity-90 transition-all disabled:opacity-50"
           >
-            {adding ? <Spinner className="h-4 w-4" /> : <span className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>}
+            {adding ? <Spinner className="h-4 w-4" /> : <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>}
             Adicionar
           </button>
         </div>
@@ -682,7 +684,7 @@ function MembersTab({ classroomId }: { classroomId: string }) {
 
       {!loading && !error && members.length === 0 && (
         <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
-          <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>group</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>group</span>
           <p className="text-body-md text-on-surface-variant">Nenhum aluno na turma ainda.</p>
         </div>
       )}
@@ -705,7 +707,7 @@ function MembersTab({ classroomId }: { classroomId: string }) {
               </div>
               {m.status === 'PENDING' && (
                 <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-tertiary-fixed/30 text-tertiary flex-shrink-0">
-                  <span className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
                   Pendente
                 </span>
               )}
@@ -714,7 +716,7 @@ function MembersTab({ classroomId }: { classroomId: string }) {
                 title="Remover da turma"
                 className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>person_remove</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>person_remove</span>
               </button>
             </li>
           ))}
@@ -798,7 +800,7 @@ function RequestsTab({ classroomId }: { classroomId: string }) {
 
       {!loading && !error && requests.length === 0 && (
         <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
-          <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>how_to_reg</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>how_to_reg</span>
           <p className="text-body-md text-on-surface-variant">
             Nenhum pedido pendente. Alunos que entrarem pelo link de convite aparecerão aqui para aprovação.
           </p>
@@ -813,7 +815,7 @@ function RequestsTab({ classroomId }: { classroomId: string }) {
               className="flex items-center gap-md p-md bg-surface-container-lowest border border-outline-variant rounded-xl"
             >
               <div className="w-10 h-10 rounded-full bg-tertiary-fixed/40 flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-tertiary" style={{ fontSize: 20 }}>schedule</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-tertiary" style={{ fontSize: 20 }}>schedule</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-label-lg text-on-surface truncate">@{r.username ?? '—'}</p>
@@ -825,7 +827,7 @@ function RequestsTab({ classroomId }: { classroomId: string }) {
                   disabled={busyId === r.studentId}
                   className="flex items-center gap-xs px-md py-sm rounded-lg text-label-lg font-semibold bg-primary text-on-primary hover:opacity-90 transition-all disabled:opacity-50"
                 >
-                  {busyId === r.studentId ? <Spinner className="h-4 w-4" /> : <span className="material-symbols-outlined" style={{ fontSize: 18 }}>check</span>}
+                  {busyId === r.studentId ? <Spinner className="h-4 w-4" /> : <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>check</span>}
                   Aceitar
                 </button>
                 <button
@@ -833,7 +835,7 @@ function RequestsTab({ classroomId }: { classroomId: string }) {
                   disabled={busyId === r.studentId}
                   className="flex items-center gap-xs px-md py-sm rounded-lg text-label-lg border border-outline-variant text-on-surface-variant hover:bg-error-container/30 hover:text-on-error-container transition-all disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
                   Recusar
                 </button>
               </div>
@@ -912,7 +914,7 @@ function InviteTab({ classroomId }: { classroomId: string }) {
       <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg">
         <div className="flex items-start gap-md mb-lg">
           <div className="w-10 h-10 rounded-full bg-primary-container/40 flex items-center justify-center flex-shrink-0">
-            <span className="material-symbols-outlined text-primary" style={{ fontSize: 20 }}>link</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-primary" style={{ fontSize: 20 }}>link</span>
           </div>
           <div>
             <h3 className="text-headline-sm text-on-surface">Link de convite</h3>
@@ -945,13 +947,14 @@ function InviteTab({ classroomId }: { classroomId: string }) {
             disabled={loading}
             className="flex items-center gap-sm px-lg py-sm rounded-xl text-label-lg font-semibold bg-primary text-on-primary hover:opacity-90 transition-all disabled:opacity-60"
           >
-            {loading ? <Spinner className="h-4 w-4" /> : <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add_link</span>}
+            {loading ? <Spinner className="h-4 w-4" /> : <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>add_link</span>}
             Gerar link de convite
           </button>
         ) : (
           <div className="flex flex-col gap-md">
             <div className="flex items-center gap-sm">
               <input
+                aria-label="Link de convite da turma"
                 readOnly
                 value={invite.inviteUrl}
                 className={`flex-1 px-md py-sm bg-surface-container-high border border-outline-variant rounded-lg text-body-md text-on-surface outline-none ${expired ? 'line-through opacity-60' : ''}`}
@@ -961,13 +964,13 @@ function InviteTab({ classroomId }: { classroomId: string }) {
                 disabled={expired}
                 className="flex items-center gap-xs px-md py-sm rounded-lg text-label-lg border border-outline-variant text-on-surface hover:bg-surface-container-low transition-all disabled:opacity-50"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{copied ? 'check' : 'content_copy'}</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>{copied ? 'check' : 'content_copy'}</span>
                 {copied ? 'Copiado' : 'Copiar'}
               </button>
             </div>
 
             <div className="flex items-center gap-sm text-label-lg">
-              <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 18 }}>schedule</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 18 }}>schedule</span>
               <span className={expired ? 'text-error' : 'text-on-surface-variant'}>
                 {expired ? 'Este link expirou.' : `Expira em ${remaining}`}
               </span>
@@ -986,7 +989,7 @@ function InviteTab({ classroomId }: { classroomId: string }) {
                   onClick={() => setFullscreen(true)}
                   className="flex items-center gap-xs text-label-lg text-primary hover:underline"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>fullscreen</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>fullscreen</span>
                   Exibir em tela cheia
                 </button>
                 <p className="text-label-sm text-on-surface-variant">Ou escaneie o QR code para entrar.</p>
@@ -998,7 +1001,7 @@ function InviteTab({ classroomId }: { classroomId: string }) {
               disabled={loading}
               className="flex items-center gap-xs text-label-lg text-primary hover:underline self-start"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>refresh</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>refresh</span>
               Gerar novo link
             </button>
           </div>

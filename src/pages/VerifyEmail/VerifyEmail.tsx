@@ -42,7 +42,7 @@ export default function VerifyEmail() {
         {status === 'success' && (
           <>
             <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mx-auto">
-              <span
+              <span aria-hidden="true"
                 className="material-symbols-outlined text-on-primary-container"
                 style={{ fontSize: 36, fontVariationSettings: "'FILL' 1" }}
               >
@@ -67,7 +67,7 @@ export default function VerifyEmail() {
         {status === 'error' && (
           <>
             <div className="w-16 h-16 rounded-full bg-error-container flex items-center justify-center mx-auto">
-              <span
+              <span aria-hidden="true"
                 className="material-symbols-outlined text-on-error-container"
                 style={{ fontSize: 36, fontVariationSettings: "'FILL' 1" }}
               >

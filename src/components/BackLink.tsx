@@ -23,7 +23,7 @@ export default function BackLink({ fallbackTo, fallbackLabel, className = '' }: 
   const base =
     'inline-flex items-center gap-xs text-label-lg text-on-surface-variant hover:text-on-surface transition-colors'
   const icon = (
-    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+    <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>
       arrow_back
     </span>
   )

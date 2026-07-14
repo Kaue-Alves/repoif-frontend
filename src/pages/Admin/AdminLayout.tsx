@@ -17,7 +17,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     <AppLayout>
       <div className="space-y-lg">
         <div className="flex items-center gap-sm">
-          <span
+          <span aria-hidden="true"
             className="material-symbols-outlined text-primary"
             style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}
           >
@@ -40,7 +40,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
                 }`
               }
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{tab.icon}</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>{tab.icon}</span>
               {tab.label}
             </NavLink>
           ))}

@@ -40,7 +40,7 @@ export default class ErrorBoundary extends Component<Props, State> {
         <div className="max-w-md w-full text-center space-y-lg">
           <div className="flex justify-center">
             <div className="w-20 h-20 rounded-full bg-error-container flex items-center justify-center">
-              <span className="material-symbols-outlined text-on-error-container" style={{ fontSize: 40 }}>
+              <span aria-hidden="true" className="material-symbols-outlined text-on-error-container" style={{ fontSize: 40 }}>
                 error
               </span>
             </div>
@@ -62,14 +62,14 @@ export default class ErrorBoundary extends Component<Props, State> {
               onClick={() => window.location.reload()}
               className="flex items-center gap-xs px-lg py-sm bg-primary text-on-primary rounded-lg text-label-lg font-semibold hover:opacity-90 transition-all"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>refresh</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>refresh</span>
               Recarregar página
             </button>
             <a
               href="/"
               className="flex items-center gap-xs px-lg py-sm border border-outline-variant text-on-surface rounded-lg text-label-lg font-semibold hover:bg-surface-container-low transition-colors"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>home</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>home</span>
               Voltar ao início
             </a>
           </div>

@@ -39,7 +39,7 @@ export default function QrFullscreenOverlay({ url, caption, onClose }: QrFullscr
         title="Sair da tela cheia (Esc)"
         className="absolute top-md right-md w-10 h-10 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
       >
-        <span className="material-symbols-outlined" style={{ fontSize: 24 }}>fullscreen_exit</span>
+        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 24 }}>fullscreen_exit</span>
       </button>
     </div>
   )

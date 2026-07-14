@@ -77,7 +77,7 @@ export default function AssignmentsTab({ subjectId, isOwner }: { subjectId: stri
     <div className="space-y-md">
       <div className="flex items-center justify-between">
         <h2 className="text-headline-sm text-on-surface flex items-center gap-sm">
-          <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>assignment</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>assignment</span>
           Trabalhos
           {!loading && <span className="text-label-sm text-on-surface-variant font-normal">({items.length})</span>}
         </h2>
@@ -86,7 +86,7 @@ export default function AssignmentsTab({ subjectId, isOwner }: { subjectId: stri
             onClick={() => setCreateOpen(true)}
             className="flex items-center gap-sm bg-primary text-on-primary px-md py-sm rounded-lg text-label-lg font-semibold hover:opacity-90 transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
             Novo trabalho
           </button>
         )}
@@ -102,7 +102,7 @@ export default function AssignmentsTab({ subjectId, isOwner }: { subjectId: stri
 
       {!loading && !error && items.length === 0 && (
         <div className="flex flex-col items-center gap-md py-xl text-center border-2 border-dashed border-outline-variant rounded-xl">
-          <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48 }}>assignment</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48 }}>assignment</span>
           <p className="text-body-md text-on-surface-variant">
             {isOwner ? 'Nenhum trabalho criado ainda.' : 'Nenhum trabalho disponível ainda.'}
           </p>
@@ -181,7 +181,7 @@ function AssignmentRow({
         className="absolute inset-0 rounded-xl focus-visible:ring-2 focus-visible:ring-primary"
       />
 
-      <span
+      <span aria-hidden="true"
         className="material-symbols-outlined text-primary flex-shrink-0 mt-xs"
         style={{ fontSize: 26, fontVariationSettings: "'FILL' 1" }}
       >
@@ -202,12 +202,12 @@ function AssignmentRow({
 
         <div className="flex items-center gap-sm flex-wrap mt-xs">
           <span className={`flex items-center gap-xs text-label-sm ${past ? 'text-error' : 'text-on-surface-variant'}`}>
-            <span className="material-symbols-outlined" style={{ fontSize: 14 }}>event</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 14 }}>event</span>
             {past ? 'Encerrado em ' : 'Entrega até '}{formatDate(item.dueDate)}
           </span>
           {isOwner && 'submissionsCount' in item && (
             <span className="flex items-center gap-xs text-label-sm text-on-surface-variant">
-              <span className="material-symbols-outlined" style={{ fontSize: 14 }}>group</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 14 }}>group</span>
               {item.submissionsCount}/{item.totalStudents} entregaram
             </span>
           )}
@@ -219,7 +219,7 @@ function AssignmentRow({
           to={`/assignments/${item.id}`}
           className="relative z-10 flex items-center gap-xs px-md py-sm rounded-lg text-label-lg text-primary hover:bg-primary-container/20 transition-colors"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>
             {isOwner ? 'grading' : 'open_in_new'}
           </span>
           {isOwner ? 'Entregas' : 'Abrir'}
@@ -230,7 +230,7 @@ function AssignmentRow({
             title="Excluir trabalho"
             className="relative z-10 w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
           </button>
         )}
       </div>
@@ -244,7 +244,7 @@ function StatusBadge({ item, isOwner, past }: { item: Item; isOwner: boolean; pa
   if (student.submitted) {
     return (
       <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-primary-container/30 text-primary">
-        <span className="material-symbols-outlined" style={{ fontSize: 12 }}>check_circle</span>
+        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>check_circle</span>
         Entregue
       </span>
     )
@@ -253,14 +253,14 @@ function StatusBadge({ item, isOwner, past }: { item: Item; isOwner: boolean; pa
   if (past) {
     return (
       <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-error-container text-on-error-container">
-        <span className="material-symbols-outlined" style={{ fontSize: 12 }}>event_busy</span>
+        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>event_busy</span>
         Não entregue
       </span>
     )
   }
   return (
     <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-surface-container-high text-on-surface-variant">
-      <span className="material-symbols-outlined" style={{ fontSize: 12 }}>pending</span>
+      <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>pending</span>
       Pendente
     </span>
   )
@@ -344,10 +344,10 @@ function CreateAssignmentModal({
           <h2 className="text-headline-sm text-on-surface">Novo trabalho</h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 
@@ -390,7 +390,7 @@ function CreateAssignmentModal({
           <span className="text-label-lg text-on-surface-variant">Anexo (opcional)</span>
           {file ? (
             <div className="flex items-center gap-sm p-sm bg-surface-container-low rounded-lg">
-              <span className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 22 }}>attach_file</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 22 }}>attach_file</span>
               <div className="flex-1 min-w-0">
                 <p className="text-label-lg text-on-surface truncate">{file.name}</p>
                 <p className="text-label-sm text-on-surface-variant">{formatFileSize(file.size)}</p>
@@ -401,7 +401,7 @@ function CreateAssignmentModal({
                 disabled={saving}
                 className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors disabled:opacity-50"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
               </button>
             </div>
           ) : (
@@ -430,7 +430,7 @@ function CreateAssignmentModal({
         <div className="flex gap-sm justify-end pt-xs">
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             disabled={saving}
             className="px-lg py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-lg hover:bg-surface-container-low transition-all disabled:opacity-60"
           >

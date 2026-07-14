@@ -23,7 +23,7 @@ export default function Pagination({ meta, loading, onPageChange }: PaginationPr
           disabled={!meta.hasPrevPage || loading}
           className="flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg text-label-lg text-on-surface-variant hover:bg-surface-container-low transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_left</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_left</span>
           Anterior
         </button>
         <button
@@ -32,7 +32,7 @@ export default function Pagination({ meta, loading, onPageChange }: PaginationPr
           className="flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg text-label-lg text-on-surface-variant hover:bg-surface-container-low transition-all disabled:opacity-40 disabled:cursor-not-allowed"
         >
           Próxima
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_right</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_right</span>
         </button>
       </div>
     </div>

@@ -53,7 +53,7 @@ export default function QrCodeModal({
       <div className="relative w-full max-w-sm bg-surface-container-lowest rounded-xl shadow-xl p-lg flex flex-col gap-md">
         <div className="flex items-start gap-md">
           <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-surface-container-high">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined text-on-surface-variant"
               style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}
             >
@@ -74,7 +74,7 @@ export default function QrCodeModal({
               title="Tela cheia"
               className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>fullscreen</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>fullscreen</span>
             </button>
           )}
 
@@ -83,7 +83,7 @@ export default function QrCodeModal({
             title="Fechar"
             className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 

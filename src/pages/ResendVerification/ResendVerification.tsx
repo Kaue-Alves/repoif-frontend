@@ -2,9 +2,14 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AuthLayout from '../../components/layouts/AuthLayout'
 import Field from '../../components/Field'
-import { requestPasswordReset } from './forgotPassword.service'
+import { resendVerification } from './resendVerification.service'
 
-export default function ForgotPassword() {
+/**
+ * Saída para quem não recebeu (ou deixou vencer) o link de verificação. Sem esta
+ * tela a conta fica trancada: o login barra quem não verificou e o recadastro
+ * esbarra no username já em uso.
+ */
+export default function ResendVerification() {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -15,10 +20,10 @@ export default function ForgotPassword() {
     setError('')
     setLoading(true)
     try {
-      await requestPasswordReset(email.trim())
+      await resendVerification(email.trim())
       setSent(true)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro ao enviar email.')
+      setError(err instanceof Error ? err.message : 'Erro ao reenviar o e-mail.')
     } finally {
       setLoading(false)
     }
@@ -26,10 +31,11 @@ export default function ForgotPassword() {
 
   if (sent) {
     return (
-      <AuthLayout title="Email enviado">
+      <AuthLayout title="E-mail enviado">
         <div className="text-center space-y-lg py-md">
           <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mx-auto">
-            <span aria-hidden="true"
+            <span
+              aria-hidden="true"
               className="material-symbols-outlined text-on-primary-container"
               style={{ fontSize: 36, fontVariationSettings: "'FILL' 1" }}
             >
@@ -39,8 +45,11 @@ export default function ForgotPassword() {
           <div className="space-y-sm">
             <p className="text-body-lg text-on-surface font-medium">Verifique sua caixa de entrada</p>
             <p className="text-body-md text-on-surface-variant">
-              Se o email <strong className="text-on-surface">{email}</strong> estiver cadastrado,
-              você receberá um link para redefinir sua senha.
+              Se o e-mail <strong className="text-on-surface">{email}</strong> tiver uma conta ainda
+              não verificada, você receberá um novo link de verificação. O link vale 24 horas.
+            </p>
+            <p className="text-body-md text-on-surface-variant">
+              Não esqueça de conferir a caixa de spam.
             </p>
           </div>
           <Link
@@ -56,11 +65,11 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout
-      title="Esqueceu a senha?"
-      subtitle="Informe seu email e enviaremos um link de redefinição"
+      title="Reenviar verificação"
+      subtitle="Informe seu e-mail e enviaremos um novo link de verificação"
     >
       <form onSubmit={handleSubmit} className="space-y-md">
-        <Field label="Email">
+        <Field label="E-mail">
           {(id) => (
             <input
               id={id}
@@ -76,8 +85,13 @@ export default function ForgotPassword() {
         </Field>
 
         {error && (
-          <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+          <div
+            role="alert"
+            className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md"
+          >
+            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>
+              error
+            </span>
             {error}
           </div>
         )}
@@ -87,12 +101,12 @@ export default function ForgotPassword() {
           disabled={loading}
           className="w-full bg-primary text-on-primary py-sm rounded-lg text-label-lg font-semibold hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed"
         >
-          {loading ? 'Enviando...' : 'Enviar link de redefinição'}
+          {loading ? 'Enviando...' : 'Reenviar link de verificação'}
         </button>
       </form>
 
       <p className="mt-lg text-center text-body-md text-on-surface-variant">
-        Lembrou a senha?{' '}
+        Já verificou sua conta?{' '}
         <Link to="/login" className="text-primary font-semibold hover:underline">
           Entrar
         </Link>

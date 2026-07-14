@@ -352,7 +352,7 @@ export default function SubjectDetail() {
     return (
       <AppLayout>
         <div className="flex flex-col items-center gap-lg py-xl text-center">
-          <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 64 }}>
+          <span aria-hidden="true" className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 64 }}>
             folder_off
           </span>
           <p className="text-body-lg text-on-surface-variant">{pageError || 'Disciplina não encontrada.'}</p>
@@ -386,7 +386,7 @@ export default function SubjectDetail() {
                 @{subject.teacherUsername}
               </Link>
             )}
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
             <span className="text-on-surface truncate max-w-xs">{subject.name}</span>
           </nav>
         </div>
@@ -401,7 +401,7 @@ export default function SubjectDetail() {
                   ? 'bg-primary-container text-on-primary-container'
                   : 'bg-surface-container-high text-on-surface-variant'
               }`}>
-                <span className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>
+                <span aria-hidden="true" className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>
                   {subject.isPublic ? 'public' : 'lock'}
                 </span>
                 {' '}{subject.isPublic ? 'Pública' : 'Privada'}
@@ -419,7 +419,7 @@ export default function SubjectDetail() {
               to={`/subjects/${subject.id}/edit`}
               className="flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg text-label-lg text-on-surface-variant hover:bg-surface-container-low transition-all flex-shrink-0"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>edit</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>edit</span>
               Editar
             </Link>
           )}
@@ -440,7 +440,7 @@ export default function SubjectDetail() {
                   : 'border-transparent text-on-surface-variant hover:text-on-surface'
               }`}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{t.icon}</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>{t.icon}</span>
               {t.label}
             </button>
           ))}
@@ -452,7 +452,7 @@ export default function SubjectDetail() {
         {tab === 'materials' && isOwner && (
           <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg space-y-md">
             <h2 className="text-headline-sm text-on-surface flex items-center gap-sm">
-              <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>upload_file</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>upload_file</span>
               Enviar arquivo
             </h2>
 
@@ -475,7 +475,7 @@ export default function SubjectDetail() {
                             : 'border-outline-variant text-on-surface-variant hover:border-primary/40'
                         }`}
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{opt.icon}</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>{opt.icon}</span>
                         {opt.label}
                       </button>
                     )
@@ -494,7 +494,7 @@ export default function SubjectDetail() {
                     role="alert"
                     className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md"
                   >
-                    <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+                    <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
                     {uploadError}
                   </div>
                 )}
@@ -504,7 +504,7 @@ export default function SubjectDetail() {
             {uploadStep === 'picking' && pending && (
               <div className="space-y-md">
                 <div className="flex items-center gap-md p-md bg-surface-container-low rounded-xl">
-                  <span
+                  <span aria-hidden="true"
                     className="material-symbols-outlined text-primary flex-shrink-0"
                     style={{ fontSize: 32, fontVariationSettings: "'FILL' 1" }}
                   >
@@ -533,7 +533,7 @@ export default function SubjectDetail() {
                             : 'border-outline-variant text-on-surface-variant hover:border-primary/40'
                         }`}
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{opt.icon}</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>{opt.icon}</span>
                         {opt.label}
                       </button>
                     )
@@ -551,7 +551,7 @@ export default function SubjectDetail() {
                     onClick={startUpload}
                     className="flex items-center gap-sm px-lg py-sm bg-primary text-on-primary rounded-lg text-label-lg font-semibold hover:opacity-90 transition-all"
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>upload</span>
+                    <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>upload</span>
                     Enviar
                   </button>
                 </div>
@@ -573,7 +573,7 @@ export default function SubjectDetail() {
 
             {uploadStep === 'done' && (
               <div className="flex items-center gap-md">
-                <span
+                <span aria-hidden="true"
                   className="material-symbols-outlined text-primary"
                   style={{ fontSize: 24, fontVariationSettings: "'FILL' 1" }}
                 >
@@ -592,7 +592,7 @@ export default function SubjectDetail() {
             {uploadStep === 'error' && (
               <div className="space-y-md">
                 <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-                  <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+                  <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
                   {uploadError}
                 </div>
                 <button
@@ -610,7 +610,7 @@ export default function SubjectDetail() {
         {tab === 'materials' && (
         <div className="space-y-md">
           <h2 className="text-headline-sm text-on-surface flex items-center gap-sm">
-            <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>folder_open</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>folder_open</span>
             Materiais de aula
             {!loadingFiles && !filesError && (
               <span className="text-label-sm text-on-surface-variant font-normal">({files.length})</span>
@@ -620,7 +620,7 @@ export default function SubjectDetail() {
           {/* O campo some quando a disciplina não tem arquivo nenhum: não há o que filtrar. */}
           {(files.length > 0 || activeFileSearch) && !filesError && (
             <div className="relative max-w-md">
-              <span
+              <span aria-hidden="true"
                 className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
                 style={{ fontSize: 20 }}
               >
@@ -651,7 +651,7 @@ export default function SubjectDetail() {
               role="alert"
               className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md"
             >
-              <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+              <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
               {filesError}
               <button
                 onClick={() => setFilesReload((k) => k + 1)}
@@ -666,7 +666,7 @@ export default function SubjectDetail() {
             </p>
           ) : files.length === 0 ? (
             <div className="flex flex-col items-center gap-md py-xl text-center border-2 border-dashed border-outline-variant rounded-xl">
-              <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48 }}>
+              <span aria-hidden="true" className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48 }}>
                 folder_open
               </span>
               <p className="text-body-md text-on-surface-variant">
@@ -686,7 +686,7 @@ export default function SubjectDetail() {
                       : 'border-outline-variant hover:bg-surface-container-low'
                   }`}
                 >
-                  <span
+                  <span aria-hidden="true"
                     className="material-symbols-outlined text-primary flex-shrink-0"
                     style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}
                   >
@@ -697,6 +697,7 @@ export default function SubjectDetail() {
                     {rename?.id === file.id ? (
                       <div className="flex items-center gap-sm">
                         <input
+                          aria-label="Novo nome do arquivo"
                           autoFocus
                           value={rename.value}
                           onChange={(e) => setRename({ id: file.id, value: e.target.value })}
@@ -709,15 +710,17 @@ export default function SubjectDetail() {
                         <button
                           onClick={saveRename}
                           disabled={renameSaving}
+                          aria-label="Salvar novo nome"
                           className="text-primary hover:opacity-70 disabled:opacity-40 transition-all"
                         >
-                          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>check</span>
+                          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>check</span>
                         </button>
                         <button
                           onClick={() => setRename(null)}
+                          aria-label="Cancelar renomeação"
                           className="text-on-surface-variant hover:opacity-70 transition-all"
                         >
-                          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+                          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
                         </button>
                       </div>
                     ) : (
@@ -729,14 +732,14 @@ export default function SubjectDetail() {
                       <span className="text-outline">·</span>
                       <span className="text-label-sm text-on-surface-variant">{formatDate(file.createdAt)}</span>
                       <span className={`text-label-sm px-xs rounded ${file.isPublic ? 'text-primary' : 'text-on-surface-variant'}`}>
-                        <span className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>
+                        <span aria-hidden="true" className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>
                           {file.isPublic ? 'public' : 'lock'}
                         </span>
                         {' '}{file.isPublic ? 'Público' : 'Privado'}
                       </span>
                       {disabled && (
                         <span className="flex items-center gap-xs px-xs rounded text-label-sm text-error">
-                          <span className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>visibility_off</span>
+                          <span aria-hidden="true" className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>visibility_off</span>
                           Desabilitado
                         </span>
                       )}
@@ -749,7 +752,7 @@ export default function SubjectDetail() {
                       title="Visualizar arquivo"
                       className="w-9 h-9 flex items-center justify-center rounded-lg text-action-view hover:bg-surface-container-high transition-all"
                     >
-                      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>visibility</span>
+                      <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>visibility</span>
                     </button>
 
                     <button
@@ -757,7 +760,7 @@ export default function SubjectDetail() {
                       title="Baixar arquivo"
                       className="w-9 h-9 flex items-center justify-center rounded-lg text-action-download hover:bg-surface-container-high transition-all"
                     >
-                      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
+                      <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
                     </button>
 
                     {/* Arquivo privado só o dono compartilha — para os demais o backend
@@ -768,7 +771,7 @@ export default function SubjectDetail() {
                         title="Compartilhar via QR code"
                         className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface hover:bg-surface-container-high transition-all"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>qr_code_2</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>qr_code_2</span>
                       </button>
                     )}
 
@@ -778,7 +781,7 @@ export default function SubjectDetail() {
                         title="Denunciar arquivo"
                         className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-error-container hover:text-on-error-container transition-all"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>flag</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>flag</span>
                       </button>
                     )}
 
@@ -793,7 +796,7 @@ export default function SubjectDetail() {
                               title={file.isPublic ? 'Tornar privado' : 'Tornar público'}
                               className="w-9 h-9 flex items-center justify-center rounded-lg text-action-visibility hover:bg-surface-container-high transition-all disabled:opacity-40"
                             >
-                              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>
                                 {file.isPublic ? 'lock' : 'public'}
                               </span>
                             </button>
@@ -803,7 +806,7 @@ export default function SubjectDetail() {
                               title="Renomear"
                               className="w-9 h-9 flex items-center justify-center rounded-lg text-action-rename hover:bg-surface-container-high transition-all"
                             >
-                              <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
+                              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
                             </button>
                           </>
                         )}
@@ -815,7 +818,7 @@ export default function SubjectDetail() {
                           title={disabled ? 'Reabilitar (voltar a exibir para os alunos)' : 'Desabilitar (ocultar dos alunos)'}
                           className="w-9 h-9 flex items-center justify-center rounded-lg text-action-visibility hover:bg-surface-container-high transition-all disabled:opacity-40"
                         >
-                          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>
                             {disabled ? 'toggle_on' : 'toggle_off'}
                           </span>
                         </button>
@@ -825,7 +828,7 @@ export default function SubjectDetail() {
                           title="Excluir definitivamente"
                           className="w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all"
                         >
-                          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete_forever</span>
+                          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>delete_forever</span>
                         </button>
                       </>
                     )}

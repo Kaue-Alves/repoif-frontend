@@ -82,6 +82,7 @@ export default function AdminReports() {
         {/* Filtros */}
         <div className="flex flex-col sm:flex-row gap-md">
           <select
+            aria-label="Filtrar por situação"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value as ReportStatus | '')}
             className="bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -93,6 +94,7 @@ export default function AdminReports() {
           </select>
 
           <select
+            aria-label="Filtrar por tipo"
             value={typeFilter}
             onChange={(e) => setTypeFilter(e.target.value as ReportTargetType | '')}
             className="bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -110,12 +112,12 @@ export default function AdminReports() {
           </div>
         ) : error ? (
           <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
             {error}
           </div>
         ) : reports.length === 0 ? (
           <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-xl">
-            <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>flag</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>flag</span>
             <p className="text-body-md text-on-surface-variant">Nenhuma denúncia encontrada.</p>
           </div>
         ) : (
@@ -169,7 +171,7 @@ function ReportCard({ report, onModerate }: { report: AdminReport; onModerate: (
     <li className="bg-surface-container-lowest border border-outline-variant rounded-xl p-lg space-y-md">
       <div className="flex items-start justify-between gap-md flex-wrap">
         <div className="flex items-center gap-sm min-w-0">
-          <span
+          <span aria-hidden="true"
             className={`material-symbols-outlined flex-shrink-0 ${isUser ? 'text-tertiary' : 'text-primary'}`}
             style={{ fontSize: 22 }}
           >
@@ -196,7 +198,7 @@ function ReportCard({ report, onModerate }: { report: AdminReport; onModerate: (
                   {opening ? (
                     <Spinner className="h-4 w-4 flex-shrink-0" />
                   ) : (
-                    <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 16 }}>open_in_new</span>
+                    <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 16 }}>open_in_new</span>
                   )}
                 </button>
               ) : (
@@ -212,7 +214,7 @@ function ReportCard({ report, onModerate }: { report: AdminReport; onModerate: (
             {!isUser && (
               owner ? (
                 <span className="flex items-center gap-xs text-label-sm text-on-surface-variant mt-xs">
-                  <span className="material-symbols-outlined" style={{ fontSize: 14 }}>account_circle</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 14 }}>account_circle</span>
                   dono:
                   <Link to={`/profile/${owner.username}`} className="text-on-surface hover:text-primary transition-colors truncate">
                     @{owner.username}
@@ -235,22 +237,22 @@ function ReportCard({ report, onModerate }: { report: AdminReport; onModerate: (
 
       {openError && (
         <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+          <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {openError}
         </div>
       )}
 
       <div className="flex flex-wrap items-center gap-x-lg gap-y-xs text-label-sm text-on-surface-variant">
         <span className="flex items-center gap-xs">
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>label</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>label</span>
           {REASON_LABELS[report.reason]}
         </span>
         <span className="flex items-center gap-xs">
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>person_raised_hand</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>person_raised_hand</span>
           por @{report.reporter?.username ?? 'desconhecido'}
         </span>
         <span className="flex items-center gap-xs">
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>schedule</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>schedule</span>
           {new Date(report.createdAt).toLocaleString('pt-BR')}
         </span>
       </div>
@@ -273,7 +275,7 @@ function ReportCard({ report, onModerate }: { report: AdminReport; onModerate: (
           onClick={onModerate}
           className="flex items-center gap-xs px-md py-sm border border-outline-variant rounded-lg text-label-lg text-on-surface-variant hover:bg-surface-container-low transition-all"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>gavel</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>gavel</span>
           Moderar
         </button>
       </div>
@@ -333,24 +335,24 @@ function ModerateModal({
       <div className="relative w-full max-w-md bg-surface-container-lowest rounded-xl shadow-xl p-lg flex flex-col gap-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-start gap-md">
           <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-primary-container/40">
-            <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>gavel</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>gavel</span>
           </div>
           <div className="flex-1">
             <h2 id="moderate-title" className="text-headline-sm text-on-surface">Moderar denúncia</h2>
             <p className="text-body-md text-on-surface-variant mt-xs">{REASON_LABELS[report.reason]}</p>
           </div>
           <button
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             disabled={submitting}
             className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all disabled:opacity-40"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 
         {error && (
           <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
             {error}
           </div>
         )}
@@ -387,7 +389,7 @@ function ModerateModal({
 
         <div className="flex gap-sm justify-end pt-xs">
           <button
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             disabled={submitting}
             className="px-lg py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-lg hover:bg-surface-container-low transition-all disabled:opacity-60"
           >

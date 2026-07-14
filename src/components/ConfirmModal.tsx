@@ -53,7 +53,7 @@ export default function ConfirmModal({
           <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${
             danger ? 'bg-error-container' : 'bg-surface-container-high'
           }`}>
-            <span
+            <span aria-hidden="true"
               className={`material-symbols-outlined ${danger ? 'text-on-error-container' : 'text-on-surface-variant'}`}
               style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}
             >

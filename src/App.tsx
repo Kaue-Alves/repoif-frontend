@@ -14,6 +14,7 @@ import ClassroomList from './pages/Classrooms/ClassroomList'
 import JoinClassroom from './pages/Classrooms/JoinClassroom'
 import Dashboard from './pages/Dashboard/Dashboard'
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword'
+import ResendVerification from './pages/ResendVerification/ResendVerification'
 import Login from './pages/Login/Login'
 import NotFound from './pages/NotFound/NotFound'
 import Profile from './pages/Profile/Profile'
@@ -40,6 +41,7 @@ function App() {
       <Route path="/register" element={<Register />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/resend-verification" element={<ResendVerification />} />
       <Route path="/reset-password" element={<ResetPassword />} />
 
       {/* Protected (any logged-in user) */}

@@ -64,7 +64,7 @@ export default function Dashboard() {
           to="/subjects/new"
           className="flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold shadow-sm hover:shadow-md hover:opacity-90 active:scale-[0.98] transition-all self-start sm:self-auto"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>add</span>
           Nova Disciplina
         </Link>
       </div>
@@ -75,7 +75,7 @@ export default function Dashboard() {
           role="alert"
           className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg"
         >
-          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+          <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {error}
           <button onClick={reload} className="ml-auto text-label-lg underline hover:no-underline">
             Tentar novamente
@@ -86,7 +86,7 @@ export default function Dashboard() {
       {/* Empty state: nenhuma disciplina e sem busca ativa */}
       {!loading && !error && subjects.length === 0 && !activeSearch && (
         <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
-          <span
+          <span aria-hidden="true"
             className="material-symbols-outlined text-outline mb-sm block"
             style={{ fontSize: 56, fontVariationSettings: "'FILL' 1" }}
           >
@@ -100,7 +100,7 @@ export default function Dashboard() {
             to="/subjects/new"
             className="inline-flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
             Criar primeira disciplina
           </Link>
         </div>
@@ -110,13 +110,13 @@ export default function Dashboard() {
       {(subjects.length > 0 || activeSearch || (loading && page === 1)) && !error && (
         <>
           <div className="relative mb-lg max-w-md">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
               style={{ fontSize: 20 }}
             >
               search
             </span>
-            <input
+            <input aria-label="Buscar disciplinas pelo nome"
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -203,7 +203,7 @@ function SubjectCard({ subject, username, onEdit, onDelete }: SubjectCardProps) 
             subject.isPublic ? 'bg-primary-container/30 text-primary' : 'bg-surface-container-high text-on-surface-variant'
           }`}
         >
-          <span
+          <span aria-hidden="true"
             className="material-symbols-outlined"
             style={{ fontSize: 22, fontVariationSettings: subject.isPublic ? "'FILL' 1" : "'FILL' 0" }}
           >
@@ -218,7 +218,7 @@ function SubjectCard({ subject, username, onEdit, onDelete }: SubjectCardProps) 
               : 'bg-surface-container-high text-on-surface-variant'
           }`}
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 12 }}>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>
             {subject.isPublic ? 'public' : 'lock'}
           </span>
           {subject.isPublic ? 'Pública' : 'Privada'}
@@ -241,21 +241,21 @@ function SubjectCard({ subject, username, onEdit, onDelete }: SubjectCardProps) 
           state={{ subject: { ...subject, teacherUsername: username } }}
           className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
           Arquivos
         </Link>
         <button
           onClick={onEdit}
           className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-primary hover:bg-primary-container/20 transition-colors"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
           Editar
         </button>
         <button
           onClick={onDelete}
           className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-secondary hover:bg-error-container/30 transition-colors ml-auto"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
           Excluir
         </button>
       </div>

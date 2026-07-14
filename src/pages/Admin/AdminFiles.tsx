@@ -104,13 +104,13 @@ export default function AdminFiles() {
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row md:items-center gap-md">
           <div className="relative flex-1">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant"
               style={{ fontSize: 20 }}
             >
               search
             </span>
-            <input
+            <input aria-label="Buscar pelo nome do arquivo"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar pelo nome do arquivo..."
@@ -131,7 +131,7 @@ export default function AdminFiles() {
 
         {actionError && (
           <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
             {actionError}
           </div>
         )}
@@ -143,12 +143,12 @@ export default function AdminFiles() {
           </div>
         ) : error ? (
           <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
             {error}
           </div>
         ) : files.length === 0 ? (
           <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-xl">
-            <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>folder_off</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>folder_off</span>
             <p className="text-body-md text-on-surface-variant">Nenhum arquivo encontrado.</p>
           </div>
         ) : (
@@ -163,7 +163,7 @@ export default function AdminFiles() {
                     isDeleted ? 'opacity-60' : ''
                   }`}
                 >
-                  <span
+                  <span aria-hidden="true"
                     className="material-symbols-outlined text-primary flex-shrink-0"
                     style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}
                   >
@@ -178,7 +178,7 @@ export default function AdminFiles() {
                       )}
                       {!file.isPublic && (
                         <span className="text-label-sm text-on-surface-variant">
-                          <span className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>lock</span>
+                          <span aria-hidden="true" className="material-symbols-outlined align-middle" style={{ fontSize: 12 }}>lock</span>
                         </span>
                       )}
                     </div>
@@ -201,7 +201,7 @@ export default function AdminFiles() {
                         title="Restaurar arquivo"
                         className="w-9 h-9 flex items-center justify-center rounded-lg text-action-download hover:bg-surface-container-high transition-all disabled:opacity-40"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>restore_from_trash</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>restore_from_trash</span>
                       </button>
                     ) : (
                       <button
@@ -209,7 +209,7 @@ export default function AdminFiles() {
                         title="Excluir (soft delete)"
                         className="w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
                       </button>
                     )}
 
@@ -218,7 +218,7 @@ export default function AdminFiles() {
                       title="Excluir definitivamente (irreversível)"
                       className="w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error hover:text-on-error transition-all"
                     >
-                      <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete_forever</span>
+                      <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>delete_forever</span>
                     </button>
                   </div>
                 </li>

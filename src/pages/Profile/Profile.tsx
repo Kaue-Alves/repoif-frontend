@@ -41,7 +41,7 @@ export default function Profile() {
 
       {error && (
         <div className="text-center py-xl">
-          <span
+          <span aria-hidden="true"
             className="material-symbols-outlined text-outline block mb-sm"
             style={{ fontSize: 48 }}
           >
@@ -60,7 +60,7 @@ export default function Profile() {
           {/* Profile Header */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-lg mb-xl pb-xl border-b border-outline-variant">
             <div className="w-20 h-20 rounded-2xl bg-primary-container flex items-center justify-center flex-shrink-0">
-              <span
+              <span aria-hidden="true"
                 className="material-symbols-outlined text-on-primary-container"
                 style={{ fontSize: 40, fontVariationSettings: "'FILL' 1" }}
               >
@@ -74,7 +74,7 @@ export default function Profile() {
                 <span
                   className={`flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium ${ROLE_BADGE_CLASSES[profile.role]}`}
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 14 }}>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 14 }}>
                     {ROLE_ICONS[profile.role]}
                   </span>
                   {ROLE_LABELS[profile.role]}
@@ -95,7 +95,7 @@ export default function Profile() {
                 to="/subjects/new"
                 className="flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold shadow-sm hover:opacity-90 active:scale-[0.98] transition-all self-start"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
                 Nova Disciplina
               </Link>
             )}
@@ -105,7 +105,7 @@ export default function Profile() {
                 onClick={() => setReportOpen(true)}
                 className="flex items-center gap-sm border border-outline-variant text-on-surface-variant px-lg py-sm rounded-xl text-label-lg font-medium hover:bg-error-container/40 hover:text-on-error-container hover:border-error/40 transition-all self-start"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>flag</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>flag</span>
                 Denunciar
               </button>
             )}
@@ -119,7 +119,7 @@ export default function Profile() {
 
               {subjects.length === 0 ? (
                 <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
-                  <span
+                  <span aria-hidden="true"
                     className="material-symbols-outlined text-outline block mb-sm"
                     style={{ fontSize: 48 }}
                   >
@@ -135,7 +135,7 @@ export default function Profile() {
                       to="/subjects/new"
                       className="inline-flex items-center gap-sm mt-lg bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
                     >
-                      <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+                      <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
                       Criar disciplina
                     </Link>
                   )}
@@ -158,7 +158,7 @@ export default function Profile() {
               </div>
             ) : (
               <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
-                <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>
+                <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>
                   school
                 </span>
                 <p className="text-body-md text-on-surface-variant">
@@ -173,7 +173,7 @@ export default function Profile() {
               className="flex items-center gap-md p-lg bg-surface-container-lowest border border-outline-variant rounded-xl hover:bg-surface-container-low hover:border-primary/40 transition-all group"
             >
               <div className="w-12 h-12 rounded-xl bg-secondary-container/40 flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-secondary" style={{ fontSize: 26 }}>
+                <span aria-hidden="true" className="material-symbols-outlined text-secondary" style={{ fontSize: 26 }}>
                   admin_panel_settings
                 </span>
               </div>
@@ -185,7 +185,7 @@ export default function Profile() {
                   Gerencie usuários, arquivos e denúncias.
                 </p>
               </div>
-              <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" style={{ fontSize: 20 }}>
+              <span aria-hidden="true" className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors" style={{ fontSize: 20 }}>
                 chevron_right
               </span>
             </Link>
@@ -232,7 +232,7 @@ function PublicSubjectCard({
 
       <div className="flex items-start justify-between mb-md pl-xs">
         <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center">
-          <span
+          <span aria-hidden="true"
             className="material-symbols-outlined"
             style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}
           >
@@ -242,7 +242,7 @@ function PublicSubjectCard({
 
         {!subject.isPublic && isOwner && (
           <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-surface-container-high text-on-surface-variant">
-            <span className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
             Privada
           </span>
         )}
@@ -264,7 +264,7 @@ function PublicSubjectCard({
           state={{ subject: { ...subject, teacherUsername: ownerUsername } }}
           className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>folder_open</span>
           Ver arquivos
         </Link>
         {isOwner && (
@@ -272,7 +272,7 @@ function PublicSubjectCard({
             to={`/subjects/${subject.id}/edit`}
             className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-primary hover:bg-primary-container/20 transition-colors"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>edit</span>
             Editar
           </Link>
         )}

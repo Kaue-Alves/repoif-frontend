@@ -74,7 +74,7 @@ export default function ClassroomList() {
             onClick={() => setCreateOpen(true)}
             className="flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold shadow-sm hover:shadow-md hover:opacity-90 active:scale-[0.98] transition-all self-start sm:self-auto"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>add</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>add</span>
             Nova Turma
           </button>
         )}
@@ -85,7 +85,7 @@ export default function ClassroomList() {
           role="alert"
           className="flex items-start gap-sm bg-error-container text-on-error-container rounded-xl px-md py-sm text-body-md mb-lg"
         >
-          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+          <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {error}
           <button onClick={reload} className="ml-auto text-label-lg underline hover:no-underline">
             Tentar novamente
@@ -96,7 +96,7 @@ export default function ClassroomList() {
       {/* Empty state: nenhuma turma e sem busca ativa */}
       {!loading && !error && classrooms.length === 0 && !activeSearch && (
         <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-2xl">
-          <span
+          <span aria-hidden="true"
             className="material-symbols-outlined text-outline mb-sm block"
             style={{ fontSize: 56, fontVariationSettings: "'FILL' 1" }}
           >
@@ -113,7 +113,7 @@ export default function ClassroomList() {
               onClick={() => setCreateOpen(true)}
               className="inline-flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
               Criar primeira turma
             </button>
           )}
@@ -124,13 +124,13 @@ export default function ClassroomList() {
       {(classrooms.length > 0 || activeSearch || (loading && page === 1)) && !error && (
         <>
           <div className="relative mb-lg max-w-md">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
               style={{ fontSize: 20 }}
             >
               search
             </span>
-            <input
+            <input aria-label="Buscar turmas pelo nome"
               type="search"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -217,12 +217,12 @@ function ClassroomCard({ classroom, isTeacher, onDelete }: ClassroomCardProps) {
 
       <div className="flex items-start justify-between mb-md pl-xs">
         <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center">
-          <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
             groups
           </span>
         </div>
         <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-surface-container-high text-on-surface-variant">
-          <span className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
           Privada
         </span>
       </div>
@@ -242,7 +242,7 @@ function ClassroomCard({ classroom, isTeacher, onDelete }: ClassroomCardProps) {
           to={`/classrooms/${classroom.id}`}
           className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
         >
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>meeting_room</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>meeting_room</span>
           Abrir turma
         </Link>
         <span className="text-label-sm text-on-surface-variant ml-auto">{formatDate(classroom.createdAt)}</span>
@@ -251,7 +251,7 @@ function ClassroomCard({ classroom, isTeacher, onDelete }: ClassroomCardProps) {
             onClick={onDelete}
             className="relative z-10 flex items-center gap-xs px-sm py-xs rounded-lg text-label-sm text-secondary hover:bg-error-container/30 transition-colors"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>delete</span>
             Excluir
           </button>
         )}
@@ -315,10 +315,10 @@ function CreateClassroomModal({
           <h2 className="text-headline-sm text-on-surface">Nova turma</h2>
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 
@@ -349,7 +349,7 @@ function CreateClassroomModal({
         <div className="flex gap-sm justify-end pt-xs">
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             disabled={saving}
             className="px-lg py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-lg hover:bg-surface-container-low transition-all disabled:opacity-60"
           >

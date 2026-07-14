@@ -99,7 +99,7 @@ export default function ReportModal({
       <div className="relative w-full max-w-md bg-surface-container-lowest rounded-xl shadow-xl p-lg flex flex-col gap-md max-h-[90vh] overflow-y-auto">
         <div className="flex items-start gap-md">
           <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-error-container">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined text-on-error-container"
               style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}
             >
@@ -118,13 +118,13 @@ export default function ReportModal({
             title="Fechar"
             className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all disabled:opacity-40"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 
         {done ? (
           <div className="flex flex-col items-center gap-md py-lg text-center">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined text-primary"
               style={{ fontSize: 40, fontVariationSettings: "'FILL' 1" }}
             >
@@ -144,7 +144,7 @@ export default function ReportModal({
           <>
             {error && (
               <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-                <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+                <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
                 {error}
               </div>
             )}

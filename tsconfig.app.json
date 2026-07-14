@@ -23,5 +23,8 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  "include": ["src"],
+  /* Os testes são conferidos por tsconfig.test.json, que tem os tipos do Node. Mantê-los
+     fora daqui é o que impede código de browser de importar `fs` e afins. */
+  "exclude": ["src/**/*.spec.ts", "src/**/*.spec.tsx", "src/test/**/*"]
 }

@@ -6,6 +6,7 @@ import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
 import type { PageMeta } from '../../utils/pagination'
 import { ROLE_LABELS } from '../../utils/roles'
+import Field from '../../components/Field'
 import {
   createUser,
   deleteUser,
@@ -127,13 +128,13 @@ export default function AdminUsers() {
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row md:items-center gap-md">
           <div className="relative flex-1">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-on-surface-variant"
               style={{ fontSize: 20 }}
             >
               search
             </span>
-            <input
+            <input aria-label="Buscar por username ou email"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por username ou email..."
@@ -142,6 +143,7 @@ export default function AdminUsers() {
           </div>
 
           <select
+            aria-label="Filtrar por papel"
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value as AdminRole | '')}
             className="bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
@@ -166,14 +168,14 @@ export default function AdminUsers() {
             onClick={() => setCreateOpen(true)}
             className="flex items-center justify-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-lg text-label-lg font-semibold hover:opacity-90 transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>person_add</span>
             Novo usuário
           </button>
         </div>
 
         {actionError && (
           <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
             {actionError}
           </div>
         )}
@@ -185,12 +187,12 @@ export default function AdminUsers() {
           </div>
         ) : error ? (
           <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
             {error}
           </div>
         ) : users.length === 0 ? (
           <div className="text-center py-xl border-2 border-dashed border-outline-variant rounded-xl">
-            <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>group_off</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>group_off</span>
             <p className="text-body-md text-on-surface-variant">Nenhum usuário encontrado.</p>
           </div>
         ) : (
@@ -207,7 +209,7 @@ export default function AdminUsers() {
                   }`}
                 >
                   <div className="w-10 h-10 rounded-full bg-primary-container/30 text-primary flex items-center justify-center flex-shrink-0">
-                    <span className="material-symbols-outlined" style={{ fontSize: 22 }}>person</span>
+                    <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 22 }}>person</span>
                   </div>
 
                   <div className="flex-1 min-w-0">
@@ -233,6 +235,7 @@ export default function AdminUsers() {
 
                     {/* Alterar papel — desabilitado para si mesmo ou excluídos */}
                     <select
+                      aria-label={`Alterar papel de ${u.username}`}
                       value={u.role}
                       onChange={(e) => handleRoleChange(u, e.target.value as AdminRole)}
                       disabled={busy || isSelf || isDeleted}
@@ -251,7 +254,7 @@ export default function AdminUsers() {
                         title="Restaurar usuário"
                         className="w-9 h-9 flex items-center justify-center rounded-lg text-action-download hover:bg-surface-container-high transition-all disabled:opacity-40"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>restore_from_trash</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>restore_from_trash</span>
                       </button>
                     ) : (
                       <button
@@ -260,7 +263,7 @@ export default function AdminUsers() {
                         title={isSelf ? 'Você não pode excluir a si mesmo' : 'Excluir usuário'}
                         className="w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all disabled:opacity-40 disabled:cursor-not-allowed"
                       >
-                        <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
                       </button>
                     )}
                   </div>
@@ -365,7 +368,7 @@ function CreateUserModal({
       >
         <div className="flex items-start gap-md">
           <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-primary-container/40">
-            <span className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>person_add</span>
+            <span aria-hidden="true" className="material-symbols-outlined text-primary" style={{ fontSize: 22 }}>person_add</span>
           </div>
           <div className="flex-1">
             <h2 id="create-user-title" className="text-headline-sm text-on-surface">Novo usuário</h2>
@@ -375,70 +378,78 @@ function CreateUserModal({
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             disabled={submitting}
             className="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all disabled:opacity-40"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 
         {error && (
           <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-            <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+            <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
             {error}
           </div>
         )}
 
         <Field label="Username">
-          <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            minLength={3}
-            maxLength={144}
-            className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+          {(id) => (
+            <input id={id}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              minLength={3}
+              maxLength={144}
+              className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          )}
         </Field>
 
         <Field label="Email">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+          {(id) => (
+            <input id={id}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          )}
         </Field>
 
         <Field label="Senha">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={8}
-            placeholder="Mínimo 8 caracteres"
-            className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          />
+          {(id) => (
+            <input id={id}
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={8}
+              placeholder="Mínimo 8 caracteres"
+              className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          )}
         </Field>
 
         <Field label="Papel">
-          <select
-            value={role}
-            onChange={(e) => setRole(e.target.value as AdminRole)}
-            className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          >
-            {ROLE_OPTIONS.map((r) => (
-              <option key={r} value={r}>{ROLE_LABELS[r]}</option>
-            ))}
-          </select>
+          {(id) => (
+            <select id={id}
+              value={role}
+              onChange={(e) => setRole(e.target.value as AdminRole)}
+              className="w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              {ROLE_OPTIONS.map((r) => (
+                <option key={r} value={r}>{ROLE_LABELS[r]}</option>
+              ))}
+            </select>
+          )}
         </Field>
 
         <div className="flex gap-sm justify-end pt-xs">
           <button
             type="button"
-            onClick={onClose}
+            onClick={onClose} aria-label="Fechar"
             disabled={submitting}
             className="px-lg py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-lg hover:bg-surface-container-low transition-all disabled:opacity-60"
           >
@@ -458,11 +469,3 @@ function CreateUserModal({
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="flex flex-col gap-xs">
-      <span className="text-label-lg text-on-surface">{label}</span>
-      {children}
-    </label>
-  )
-}

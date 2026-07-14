@@ -53,7 +53,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                 role="alert"
                 className={`pointer-events-auto flex items-start gap-sm rounded-xl px-md py-sm shadow-md text-body-md ${style.box}`}
               >
-                <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>
+                <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>
                   {style.icon}
                 </span>
                 <span className="flex-1 min-w-0 break-words">{t.message}</span>
@@ -62,7 +62,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
                   aria-label="Fechar aviso"
                   className="flex-shrink-0 hover:opacity-70 transition-opacity"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
                 </button>
               </div>
             )

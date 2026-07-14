@@ -33,7 +33,7 @@ export default function JoinClassroom() {
         {!loading && error && (
           <div>
             <div className="w-16 h-16 rounded-full bg-error-container flex items-center justify-center mx-auto mb-md">
-              <span
+              <span aria-hidden="true"
                 className="material-symbols-outlined text-on-error-container"
                 style={{ fontSize: 32, fontVariationSettings: "'FILL' 1" }}
               >
@@ -46,7 +46,7 @@ export default function JoinClassroom() {
               to="/classrooms"
               className="inline-flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>groups</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>groups</span>
               Ir para minhas turmas
             </Link>
           </div>
@@ -57,7 +57,7 @@ export default function JoinClassroom() {
         {!loading && result && result.status === 'ACTIVE' && (
           <div>
             <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mx-auto mb-md">
-              <span
+              <span aria-hidden="true"
                 className="material-symbols-outlined text-on-primary-container"
                 style={{ fontSize: 32, fontVariationSettings: "'FILL' 1" }}
               >
@@ -72,7 +72,7 @@ export default function JoinClassroom() {
               to={`/classrooms/${result.classroom.id}`}
               className="inline-flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>meeting_room</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>meeting_room</span>
               Abrir a turma
             </Link>
           </div>
@@ -81,7 +81,7 @@ export default function JoinClassroom() {
         {!loading && result && result.status === 'PENDING' && (
           <div>
             <div className="w-16 h-16 rounded-full bg-primary-container flex items-center justify-center mx-auto mb-md">
-              <span
+              <span aria-hidden="true"
                 className="material-symbols-outlined text-on-primary-container"
                 style={{ fontSize: 32, fontVariationSettings: "'FILL' 1" }}
               >
@@ -97,7 +97,7 @@ export default function JoinClassroom() {
               to="/classrooms"
               className="inline-flex items-center gap-sm bg-primary text-on-primary px-lg py-sm rounded-xl text-label-lg font-semibold hover:opacity-90 transition-all"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>groups</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>groups</span>
               Ir para minhas turmas
             </Link>
           </div>

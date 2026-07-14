@@ -24,7 +24,7 @@ export default function AdminDashboard() {
         </div>
       ) : error ? (
         <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+          <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {error}
         </div>
       ) : stats ? (
@@ -89,7 +89,7 @@ function StatCard({
     >
       <div className="flex items-center gap-sm mb-md">
         <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center">
-          <span className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
             {icon}
           </span>
         </div>

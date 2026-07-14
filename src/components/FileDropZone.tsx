@@ -82,7 +82,7 @@ export default function FileDropZone({
             : 'border-outline-variant hover:border-primary hover:bg-primary-container/5'
         }`}
       >
-        <span
+        <span aria-hidden="true"
           className={`material-symbols-outlined transition-colors ${
             dragging ? 'text-primary' : 'text-on-surface-variant group-hover:text-primary'
           }`}

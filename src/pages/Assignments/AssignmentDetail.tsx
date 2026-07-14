@@ -99,11 +99,11 @@ export default function AssignmentDetail() {
     return (
       <AppLayout>
         <div className="text-center py-xl">
-          <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>assignment_late</span>
+          <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>assignment_late</span>
           <h2 className="text-headline-sm text-on-surface mb-xs">Trabalho indisponível</h2>
           <p className="text-body-md text-on-surface-variant mb-lg">{error || 'Trabalho não encontrado.'}</p>
           <button onClick={() => navigate(-1)} className="inline-flex items-center gap-sm text-label-lg text-primary hover:underline">
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>arrow_back</span>
             Voltar
           </button>
         </div>
@@ -128,7 +128,7 @@ export default function AssignmentDetail() {
             <Link to={`/subjects/${assignment.subjectId}`} className="hover:text-primary transition-colors truncate">
               {assignment.subjectName}
             </Link>
-            <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
             <span className="text-on-surface truncate max-w-xs">{assignment.title}</span>
           </nav>
         </div>
@@ -138,14 +138,14 @@ export default function AssignmentDetail() {
           <div className="flex items-start justify-between gap-md">
             <div className="flex-1 min-w-0">
               <h1 className="text-headline-md text-on-surface flex items-center gap-sm">
-                <span className="material-symbols-outlined text-primary" style={{ fontSize: 26, fontVariationSettings: "'FILL' 1" }}>assignment</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-primary" style={{ fontSize: 26, fontVariationSettings: "'FILL' 1" }}>assignment</span>
                 {assignment.title}
               </h1>
               {assignment.description && (
                 <p className="text-body-md text-on-surface-variant mt-sm whitespace-pre-wrap">{assignment.description}</p>
               )}
               <p className={`flex items-center gap-xs text-label-lg mt-md ${past ? 'text-error' : 'text-on-surface-variant'}`}>
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>event</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>event</span>
                 {past ? 'Prazo encerrado em ' : 'Entrega até '}{formatDate(assignment.dueDate)}
               </p>
 
@@ -154,7 +154,7 @@ export default function AssignmentDetail() {
                   onClick={downloadAttachment}
                   className="flex items-center gap-sm mt-md p-sm bg-surface-container-low rounded-lg hover:bg-surface-container transition-colors text-left w-full max-w-sm"
                 >
-                  <span className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 22 }}>
+                  <span aria-hidden="true" className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 22 }}>
                     {getMimeIcon(assignment.attachmentMimeType ?? '')}
                   </span>
                   <div className="flex-1 min-w-0">
@@ -163,7 +163,7 @@ export default function AssignmentDetail() {
                       Anexo do trabalho{assignment.attachmentSize ? ` · ${formatFileSize(assignment.attachmentSize)}` : ''}
                     </p>
                   </div>
-                  <span className="material-symbols-outlined text-on-surface-variant flex-shrink-0" style={{ fontSize: 20 }}>download</span>
+                  <span aria-hidden="true" className="material-symbols-outlined text-on-surface-variant flex-shrink-0" style={{ fontSize: 20 }}>download</span>
                 </button>
               )}
             </div>
@@ -174,14 +174,14 @@ export default function AssignmentDetail() {
                   title="Editar"
                   className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>edit</span>
                 </button>
                 <button
                   onClick={() => setDeleteOpen(true)}
                   title="Excluir"
                   className="w-9 h-9 flex items-center justify-center rounded-lg text-error hover:bg-error-container hover:text-on-error-container transition-all"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>delete</span>
                 </button>
               </div>
             )}
@@ -196,7 +196,7 @@ export default function AssignmentDetail() {
           <StudentSubmission assignment={assignment} past={past} onChanged={() => fetchAssignment(id)} />
         ) : (
           <p className="flex items-center gap-sm text-body-md text-on-surface-variant bg-surface-container-low rounded-xl px-md py-sm">
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>visibility</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>visibility</span>
             Você está visualizando este trabalho. Apenas alunos da turma podem enviar entregas.
           </p>
         )}
@@ -278,7 +278,7 @@ function StudentSubmission({
 
       {submission && (
         <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-md">
-          <span className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}>
+          <span aria-hidden="true" className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}>
             {getMimeIcon(submission.mimeType)}
           </span>
           <div className="flex-1 min-w-0">
@@ -289,7 +289,7 @@ function StudentSubmission({
               <span className="text-label-sm text-on-surface-variant">Enviado em {formatDateTime(submission.submittedAt)}</span>
               {submission.late && (
                 <span className="text-label-sm text-error flex items-center gap-xs">
-                  <span className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
                   Entrega atrasada
                 </span>
               )}
@@ -300,7 +300,7 @@ function StudentSubmission({
             title="Baixar minha entrega"
             className="w-9 h-9 flex items-center justify-center rounded-lg text-action-download hover:bg-surface-container-high transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
           </button>
         </div>
       )}
@@ -308,28 +308,28 @@ function StudentSubmission({
       {/* Status / ação */}
       {submission && !assignment.canSubmit && (
         <div className="flex items-center gap-sm bg-primary-container/20 text-primary rounded-lg px-md py-sm text-body-md">
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>check_circle</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>check_circle</span>
           Trabalho entregue. Para reenviar, peça ao professor que libere o reenvio.
         </div>
       )}
 
       {submission && assignment.canSubmit && !past && (
         <div className="flex items-center gap-sm bg-tertiary-fixed/20 text-tertiary rounded-lg px-md py-sm text-body-md">
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>lock_open</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>lock_open</span>
           Reenvio liberado. Ao enviar um novo arquivo, o anterior será substituído.
         </div>
       )}
 
       {past && !submission && (
         <div className="flex items-center gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>error</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>error</span>
           O prazo de entrega encerrou e você não enviou este trabalho.
         </div>
       )}
 
       {error && (
         <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+          <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
           {error}
         </div>
       )}
@@ -460,7 +460,7 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
           <ul className="space-y-sm">
             {overview.submitted.map((s) => (
               <li key={s.id} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-md">
-                <span className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}>
+                <span aria-hidden="true" className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 28, fontVariationSettings: "'FILL' 1" }}>
                   {getMimeIcon(s.mimeType)}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -473,13 +473,13 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
                     <span className="text-label-sm text-on-surface-variant">{formatDateTime(s.submittedAt)}</span>
                     {s.late && (
                       <span className="text-label-sm text-error flex items-center gap-xs">
-                        <span className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>schedule</span>
                         Atrasada
                       </span>
                     )}
                     {s.resubmitAllowed && (
                       <span className="text-label-sm text-tertiary flex items-center gap-xs">
-                        <span className="material-symbols-outlined" style={{ fontSize: 12 }}>lock_open</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>lock_open</span>
                         Reenvio liberado
                       </span>
                     )}
@@ -491,7 +491,7 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
                     title="Baixar entrega"
                     className="w-9 h-9 flex items-center justify-center rounded-lg text-action-download hover:bg-surface-container-high transition-all"
                   >
-                    <span className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
+                    <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>download</span>
                   </button>
                   {!s.resubmitAllowed && (
                     <button
@@ -503,7 +503,7 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
                       {busyId === s.studentId ? (
                         <Spinner className="h-4 w-4" />
                       ) : (
-                        <span className="material-symbols-outlined" style={{ fontSize: 18 }}>lock_open</span>
+                        <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>lock_open</span>
                       )}
                       Permitir reenvio
                     </button>
@@ -520,14 +520,14 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
           {overview.notSubmitted.map((u) => (
             <li key={u.studentId} className="bg-surface-container-lowest border border-outline-variant rounded-xl p-md flex items-center gap-md">
               <div className="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0">
-                <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 20 }}>person</span>
+                <span aria-hidden="true" className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 20 }}>person</span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-label-lg text-on-surface truncate">@{u.username}</p>
                 <p className="text-label-sm text-on-surface-variant truncate">{u.email}</p>
               </div>
               <span className="text-label-sm text-on-surface-variant flex items-center gap-xs">
-                <span className="material-symbols-outlined" style={{ fontSize: 16 }}>pending</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>pending</span>
                 Pendente
               </span>
             </li>
@@ -541,7 +541,7 @@ function TeacherSubmissions({ assignmentId }: { assignmentId: string }) {
 function StatCard({ label, value, icon, accent }: { label: string; value: number; icon: string; accent?: boolean }) {
   return (
     <div className={`rounded-xl border p-md flex flex-col items-center text-center ${accent ? 'border-primary/30 bg-primary-container/15' : 'border-outline-variant bg-surface-container-lowest'}`}>
-      <span className={`material-symbols-outlined ${accent ? 'text-primary' : 'text-on-surface-variant'}`} style={{ fontSize: 22 }}>{icon}</span>
+      <span aria-hidden="true" className={`material-symbols-outlined ${accent ? 'text-primary' : 'text-on-surface-variant'}`} style={{ fontSize: 22 }}>{icon}</span>
       <span className="text-headline-sm text-on-surface mt-xs">{value}</span>
       <span className="text-label-sm text-on-surface-variant">{label}</span>
     </div>
@@ -551,7 +551,7 @@ function StatCard({ label, value, icon, accent }: { label: string; value: number
 function EmptyState({ icon, text }: { icon: string; text: string }) {
   return (
     <div className="flex flex-col items-center gap-md py-xl text-center border-2 border-dashed border-outline-variant rounded-xl">
-      <span className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48 }}>{icon}</span>
+      <span aria-hidden="true" className="material-symbols-outlined text-on-surface-variant" style={{ fontSize: 48 }}>{icon}</span>
       <p className="text-body-md text-on-surface-variant">{text}</p>
     </div>
   )
@@ -633,8 +633,8 @@ function EditAssignmentModal({
       <form onSubmit={handleSubmit} className="relative w-full max-w-md bg-surface-container-lowest rounded-xl shadow-xl p-lg flex flex-col gap-md">
         <div className="flex items-center justify-between">
           <h2 className="text-headline-sm text-on-surface">Editar trabalho</h2>
-          <button type="button" onClick={onClose} className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all">
-            <span className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+          <button type="button" onClick={onClose} aria-label="Fechar" className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all">
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
           </button>
         </div>
 
@@ -673,27 +673,27 @@ function EditAssignmentModal({
           <span className="text-label-lg text-on-surface-variant">Anexo (opcional)</span>
           {file ? (
             <div className="flex items-center gap-sm p-sm bg-surface-container-low rounded-lg">
-              <span className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 22 }}>attach_file</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 22 }}>attach_file</span>
               <div className="flex-1 min-w-0">
                 <p className="text-label-lg text-on-surface truncate">{file.name}</p>
                 <p className="text-label-sm text-on-surface-variant">{formatFileSize(file.size)} · substituirá o anexo atual</p>
               </div>
               <button type="button" onClick={() => setFile(null)} disabled={saving} className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors disabled:opacity-50">
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>close</span>
               </button>
             </div>
           ) : hasCurrentAttachment ? (
             <div className="flex items-center gap-sm p-sm bg-surface-container-low rounded-lg">
-              <span className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 22 }}>attach_file</span>
+              <span aria-hidden="true" className="material-symbols-outlined text-primary flex-shrink-0" style={{ fontSize: 22 }}>attach_file</span>
               <div className="flex-1 min-w-0">
                 <p className="text-label-lg text-on-surface truncate">{assignment.attachmentName}</p>
                 <p className="text-label-sm text-on-surface-variant">Anexo atual</p>
               </div>
               <button type="button" onClick={() => fileInputRef.current?.click()} title="Substituir" className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors">
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>swap_horiz</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>swap_horiz</span>
               </button>
               <button type="button" onClick={() => setRemoveAttachment(true)} title="Remover" className="w-8 h-8 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/30 transition-colors">
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>delete</span>
               </button>
             </div>
           ) : (
@@ -702,7 +702,7 @@ function EditAssignmentModal({
               onClick={() => { setRemoveAttachment(false); fileInputRef.current?.click() }}
               className="flex items-center justify-center gap-sm border-2 border-dashed border-outline-variant rounded-lg py-md text-label-lg text-on-surface-variant hover:border-primary hover:text-primary transition-all"
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>attach_file</span>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>attach_file</span>
               {assignment.attachmentKey ? 'Anexo removido — anexar outro' : 'Anexar arquivo'}
             </button>
           )}
@@ -730,7 +730,7 @@ function EditAssignmentModal({
         {error && <p className="text-body-md text-error">{error}</p>}
 
         <div className="flex gap-sm justify-end pt-xs">
-          <button type="button" onClick={onClose} disabled={saving} className="px-lg py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-lg hover:bg-surface-container-low transition-all disabled:opacity-60">
+          <button type="button" onClick={onClose} aria-label="Fechar" disabled={saving} className="px-lg py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-lg hover:bg-surface-container-low transition-all disabled:opacity-60">
             Cancelar
           </button>
           <button type="submit" disabled={saving} className="flex items-center gap-sm px-lg py-sm rounded-lg text-label-lg font-semibold bg-primary text-on-primary hover:opacity-90 transition-all disabled:opacity-60">

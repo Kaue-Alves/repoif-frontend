@@ -7,7 +7,7 @@ export default function NotFound() {
       <div className="max-w-md mx-auto text-center space-y-lg py-xl">
         <div className="flex justify-center">
           <div className="w-20 h-20 rounded-full bg-primary-container flex items-center justify-center">
-            <span
+            <span aria-hidden="true"
               className="material-symbols-outlined text-on-primary-container"
               style={{ fontSize: 40 }}
             >
@@ -29,14 +29,14 @@ export default function NotFound() {
             to="/"
             className="flex items-center gap-xs px-lg py-sm bg-primary text-on-primary rounded-lg text-label-lg font-semibold hover:opacity-90 transition-all"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>home</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>home</span>
             Voltar ao início
           </Link>
           <Link
             to="/search"
             className="flex items-center gap-xs px-lg py-sm border border-outline-variant text-on-surface rounded-lg text-label-lg font-semibold hover:bg-surface-container-low transition-colors"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>search</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>search</span>
             Buscar professores
           </Link>
         </div>

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import AppLayout from '../../components/layouts/AppLayout'
 import Spinner from '../../components/Spinner'
 import { createSubject } from './subjects.service'
+import Field from '../../components/Field'
 
 export default function SubjectNew() {
   const navigate = useNavigate()
@@ -35,7 +36,7 @@ export default function SubjectNew() {
         {/* Breadcrumb */}
         <nav className="flex items-center gap-xs text-label-sm text-on-surface-variant mb-lg">
           <Link to="/dashboard" className="hover:text-primary transition-colors">Dashboard</Link>
-          <span className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
+          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 16 }}>chevron_right</span>
           <span className="text-on-surface">Nova Disciplina</span>
         </nav>
 
@@ -45,27 +46,34 @@ export default function SubjectNew() {
           <form onSubmit={handleSubmit} className="space-y-lg">
             {/* Name */}
             <Field label="Nome da disciplina" required>
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Ex: Algoritmos e Lógica de Programação"
-                maxLength={255}
-                required
-                className={inputClass}
-              />
-              <p className="text-label-sm text-on-surface-variant mt-xs">{name.length}/255 caracteres</p>
+              {(id) => (
+                <>
+                  <input
+                    id={id}
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Ex: Algoritmos e Lógica de Programação"
+                    maxLength={255}
+                    required
+                    className={inputClass}
+                  />
+                  <p className="text-label-sm text-on-surface-variant mt-xs">{name.length}/255 caracteres</p>
+                </>
+              )}
             </Field>
 
             {/* Description */}
             <Field label="Descrição" hint="Opcional">
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Descreva brevemente o conteúdo da disciplina..."
-                rows={4}
-                className={`${inputClass} resize-none`}
-              />
+              {(id) => (
+                <textarea id={id}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Descreva brevemente o conteúdo da disciplina..."
+                  rows={4}
+                  className={`${inputClass} resize-none`}
+                />
+              )}
             </Field>
 
             {/* Visibility */}
@@ -98,7 +106,7 @@ export default function SubjectNew() {
                           : 'border-outline-variant text-on-surface-variant hover:border-primary/40'
                       }`}
                     >
-                      <span
+                      <span aria-hidden="true"
                         className="material-symbols-outlined"
                         style={{
                           fontSize: 24,
@@ -119,7 +127,7 @@ export default function SubjectNew() {
 
             {error && (
               <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-                <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
+                <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>error</span>
                 {error}
               </div>
             )}
@@ -144,7 +152,7 @@ export default function SubjectNew() {
                   </>
                 ) : (
                   <>
-                    <span className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
+                    <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>add</span>
                     Criar Disciplina
                   </>
                 )}
@@ -160,27 +168,3 @@ export default function SubjectNew() {
 const inputClass =
   'w-full bg-surface-container-low border border-outline-variant rounded-lg px-md py-sm text-body-md text-on-surface placeholder:text-outline outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all'
 
-function Field({
-  label,
-  hint,
-  required,
-  children,
-}: {
-  label: string
-  hint?: string
-  required?: boolean
-  children: React.ReactNode
-}) {
-  return (
-    <div className="space-y-xs">
-      <div className="flex items-center gap-sm">
-        <label className="block text-label-lg text-on-surface">
-          {label}
-          {required && <span className="text-secondary ml-xs">*</span>}
-        </label>
-        {hint && <span className="text-label-sm text-on-surface-variant">({hint})</span>}
-      </div>
-      {children}
-    </div>
-  )
-}

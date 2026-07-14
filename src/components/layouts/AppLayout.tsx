@@ -58,7 +58,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 to={item.to}
                 className="flex items-center gap-xs px-md py-xs rounded-lg text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>{item.icon}</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>{item.icon}</span>
                 {item.label}
               </Link>
             ))}
@@ -86,7 +86,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                   className="hidden md:flex items-center gap-xs px-md py-xs rounded-lg text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
                   title="Sair"
                 >
-                  <span className="material-symbols-outlined" style={{ fontSize: 18 }}>logout</span>
+                  <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>logout</span>
                   Sair
                 </button>
               </>
@@ -95,7 +95,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 to="/login"
                 className="hidden md:flex items-center gap-xs px-md py-sm bg-primary text-on-primary rounded-lg text-label-lg font-semibold hover:opacity-90 transition-all"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 18 }}>login</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>login</span>
                 Entrar
               </Link>
             )}
@@ -107,7 +107,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
               aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
               aria-expanded={menuOpen}
             >
-              <span className="material-symbols-outlined" style={{ fontSize: 24 }}>
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 24 }}>
                 {menuOpen ? 'close' : 'menu'}
               </span>
             </button>
@@ -124,7 +124,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center gap-sm px-md py-sm rounded-lg text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>{item.icon}</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>{item.icon}</span>
                 {item.label}
               </Link>
             ))}
@@ -136,7 +136,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 onClick={handleLogout}
                 className="flex items-center gap-sm px-md py-sm rounded-lg text-label-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors text-left"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>logout</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>logout</span>
                 Sair
               </button>
             ) : (
@@ -145,7 +145,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
                 onClick={() => setMenuOpen(false)}
                 className="flex items-center justify-center gap-sm px-md py-sm bg-primary text-on-primary rounded-lg text-label-lg font-semibold hover:opacity-90 transition-all"
               >
-                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>login</span>
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>login</span>
                 Entrar
               </Link>
             )}

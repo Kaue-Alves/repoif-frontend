@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import AuthLayout from '../../components/layouts/AuthLayout'
+import Field from '../../components/Field'
 import Spinner from '../../components/Spinner'
 import { useAuth } from '../../contexts/AuthContext'
 import { homePathFor } from '../../utils/roles'
@@ -38,8 +39,8 @@ export default function Login() {
       const from = (location.state as { from?: { pathname: string; search: string } } | null)?.from
       navigate(from ? `${from.pathname}${from.search}` : homePathFor(user), { replace: true })
     } catch (err) {
-      const msg = err instanceof Error ? err.message : 'Erro ao fazer login'
-      setError(translateError(msg))
+      // A mensagem já vem em português do backend (regra 6f) — não se traduz aqui.
+      setError(err instanceof Error ? err.message : 'Erro ao fazer login.')
     } finally {
       setLoading(false)
     }
@@ -52,45 +53,52 @@ export default function Login() {
           role="alert"
           className="flex items-start gap-sm bg-surface-container-high text-on-surface rounded-lg px-md py-sm text-body-md mb-md"
         >
-          <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>schedule</span>
+          <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>schedule</span>
           Sua sessão expirou. Entre novamente para continuar.
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-md">
         <Field label="Username ou email">
-          <input
-            type="text"
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            placeholder="Ex: joaosilva ou joao@email.com"
-            autoComplete="username"
-            required
-            className={inputClass}
-          />
+          {(id) => (
+            <input
+              id={id}
+              type="text"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              placeholder="Ex: joaosilva ou joao@email.com"
+              autoComplete="username"
+              required
+              className={inputClass}
+            />
+          )}
         </Field>
 
         <Field label="Senha">
-          <div className="relative">
-            <input
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              autoComplete="current-password"
-              required
-              className={`${inputClass} pr-10`}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword((v) => !v)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
-              tabIndex={-1}
-            >
-              <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
-                {showPassword ? 'visibility_off' : 'visibility'}
-              </span>
-            </button>
-          </div>
+          {(id) => (
+            <div className="relative">
+              <input
+                id={id}
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                autoComplete="current-password"
+                required
+                className={`${inputClass} pr-10`}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition-colors"
+                tabIndex={-1}
+              >
+                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>
+                  {showPassword ? 'visibility_off' : 'visibility'}
+                </span>
+              </button>
+            </div>
+          )}
         </Field>
 
         {error && <ErrorBox message={error} />}
@@ -122,6 +130,13 @@ export default function Login() {
           Cadastre-se
         </Link>
       </p>
+
+      <p className="mt-sm text-center text-body-md text-on-surface-variant">
+        Não recebeu o e-mail de verificação?{' '}
+        <Link to="/resend-verification" className="text-primary font-semibold hover:underline">
+          Reenviar
+        </Link>
+      </p>
     </AuthLayout>
   )
 }
@@ -134,32 +149,16 @@ const inputClass =
 const primaryBtn =
   'w-full bg-primary text-on-primary py-sm rounded-lg text-label-lg font-semibold hover:opacity-90 active:scale-[0.98] transition-all disabled:opacity-60 disabled:cursor-not-allowed'
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="space-y-xs">
-      <label className="block text-label-lg text-on-surface">{label}</label>
-      {children}
-    </div>
-  )
-}
-
 function ErrorBox({ message }: { message: string }) {
   return (
-    <div className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md">
-      <span className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>
+    <div
+      role="alert"
+      className="flex items-start gap-sm bg-error-container text-on-error-container rounded-lg px-md py-sm text-body-md"
+    >
+      <span aria-hidden="true" className="material-symbols-outlined flex-shrink-0" style={{ fontSize: 18 }}>
         error
       </span>
       {message}
     </div>
   )
-}
-
-function translateError(msg: string): string {
-  const map: Record<string, string> = {
-    Unauthorized: 'Credenciais inválidas. Verifique username/email e senha.',
-    'Invalid credentials': 'Credenciais inválidas.',
-    'Email not verified': 'Email não verificado. Acesse sua caixa de entrada e confirme o email.',
-    'User not found': 'Usuário não encontrado.',
-  }
-  return map[msg] ?? msg
 }

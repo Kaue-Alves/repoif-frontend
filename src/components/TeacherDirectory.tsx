@@ -34,13 +34,13 @@ export default function TeacherDirectory() {
     <div className="space-y-xl">
       {/* Search input */}
       <div className="relative max-w-xl mx-auto">
-        <span
+        <span aria-hidden="true"
           className="material-symbols-outlined absolute left-md top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
           style={{ fontSize: 20 }}
         >
           search
         </span>
-        <input
+        <input aria-label="Buscar professor pelo nome"
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -63,7 +63,7 @@ export default function TeacherDirectory() {
       {/* Error */}
       {error && !loading && (
         <div className="text-center py-xl">
-          <span className="material-symbols-outlined text-error block mb-sm" style={{ fontSize: 48 }}>
+          <span aria-hidden="true" className="material-symbols-outlined text-error block mb-sm" style={{ fontSize: 48 }}>
             error
           </span>
           <p className="text-body-md text-on-surface-variant">{error}</p>
@@ -85,7 +85,7 @@ export default function TeacherDirectory() {
       {/* Empty */}
       {!loading && !error && !hasResults && (
         <div className="text-center py-xl">
-          <span className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>
+          <span aria-hidden="true" className="material-symbols-outlined text-outline block mb-sm" style={{ fontSize: 48 }}>
             person_search
           </span>
           <p className="text-body-md text-on-surface-variant">
@@ -115,7 +115,7 @@ export default function TeacherDirectory() {
             disabled={!meta.hasPrevPage || loading}
             className="flex items-center gap-xs px-md py-sm rounded-lg border border-outline-variant text-label-lg text-on-surface hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_left</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_left</span>
             Anterior
           </button>
 
@@ -129,7 +129,7 @@ export default function TeacherDirectory() {
             className="flex items-center gap-xs px-md py-sm rounded-lg border border-outline-variant text-label-lg text-on-surface hover:bg-surface-container-low transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Próximo
-            <span className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_right</span>
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>chevron_right</span>
           </button>
         </div>
       )}
@@ -157,7 +157,7 @@ function TeacherCard({ teacher }: { teacher: TeacherListItem }) {
           {count} {count === 1 ? 'disciplina pública' : 'disciplinas públicas'}
         </p>
       </div>
-      <span
+      <span aria-hidden="true"
         className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors flex-shrink-0"
         style={{ fontSize: 20 }}
       >
