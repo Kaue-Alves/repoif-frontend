@@ -25,6 +25,7 @@ import {
   rejectClassroomRequest,
   removeClassroomMember,
   removeClassroomSubject,
+  updateClassroom,
   type Classroom,
   type ClassroomInvite,
   type ClassroomMember,
@@ -36,10 +37,12 @@ type Tab = 'subjects' | 'members' | 'requests' | 'invite'
 export default function ClassroomDetail() {
   const { id } = useParams<{ id: string }>()
   const { user } = useAuth()
+  const showToast = useToast()
 
   const [classroom, setClassroom] = useState<Classroom | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [editNameOpen, setEditNameOpen] = useState(false)
   // A aba vive na URL: sobrevive a F5, é compartilhável e o voltar do navegador
   // volta de aba em vez de sair da página.
   const [searchParams, setSearchParams] = useSearchParams()
@@ -115,10 +118,6 @@ export default function ClassroomDetail() {
           <div className="flex-1 min-w-0">
             <div className="flex flex-wrap items-center gap-sm">
               <h1 className="text-headline-lg text-on-surface">{classroom.name}</h1>
-              <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-surface-container-high text-on-surface-variant">
-                <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
-                Privada
-              </span>
             </div>
             {classroom.description && (
               <p className="text-body-md text-on-surface-variant mt-xs">{classroom.description}</p>
@@ -127,6 +126,15 @@ export default function ClassroomDetail() {
               <p className="text-label-sm text-on-surface-variant mt-xs">Você participa desta turma como aluno.</p>
             )}
           </div>
+          {isOwner && (
+            <button
+              onClick={() => setEditNameOpen(true)}
+              className="flex items-center gap-xs px-md py-sm rounded-xl border border-outline-variant text-label-lg text-on-surface-variant hover:bg-surface-container-low hover:text-on-surface transition-colors"
+            >
+              <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 18 }}>edit</span>
+              Renomear
+            </button>
+          )}
         </div>
       </div>
 
@@ -152,7 +160,123 @@ export default function ClassroomDetail() {
       {activeTab === 'members' && isOwner && <MembersTab classroomId={id} />}
       {activeTab === 'requests' && isOwner && <RequestsTab classroomId={id} />}
       {activeTab === 'invite' && isOwner && <InviteTab classroomId={id} />}
+
+      {isOwner && (
+        <EditClassroomNameModal
+          open={editNameOpen}
+          classroom={classroom}
+          onClose={() => setEditNameOpen(false)}
+          onSaved={(updated) => {
+            setClassroom(updated)
+            setEditNameOpen(false)
+            showToast('Nome da turma atualizado.', 'success')
+          }}
+        />
+      )}
     </AppLayout>
+  )
+}
+
+function EditClassroomNameModal({
+  open,
+  classroom,
+  onClose,
+  onSaved,
+}: {
+  open: boolean
+  classroom: Classroom
+  onClose: () => void
+  onSaved: (classroom: Classroom) => void
+}) {
+  const [name, setName] = useState(classroom.name)
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (open) {
+      setName(classroom.name)
+      setError('')
+    }
+  }, [open, classroom.name])
+
+  if (!open) return null
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    const trimmed = name.trim()
+    if (!trimmed) {
+      setError('Informe o nome da turma.')
+      return
+    }
+    if (trimmed === classroom.name) {
+      onClose()
+      return
+    }
+
+    setSaving(true)
+    setError('')
+    try {
+      const updated = await updateClassroom(classroom.id, { name: trimmed })
+      onSaved(updated)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Erro ao atualizar turma.')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-md" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-black/40" onClick={() => { if (!saving) onClose() }} />
+      <form
+        onSubmit={handleSubmit}
+        className="relative w-full max-w-md bg-surface-container-lowest rounded-xl shadow-xl p-lg flex flex-col gap-md"
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-headline-sm text-on-surface">Renomear turma</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Fechar"
+            disabled={saving}
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-all disabled:opacity-60"
+          >
+            <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 20 }}>close</span>
+          </button>
+        </div>
+
+        <label className="flex flex-col gap-xs">
+          <span className="text-label-lg text-on-surface-variant">Nome</span>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            autoFocus
+            className="w-full px-md py-sm bg-surface-container-lowest border border-outline-variant rounded-lg text-body-lg text-on-surface placeholder:text-on-surface-variant outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+          />
+        </label>
+
+        {error && <p className="text-body-md text-error">{error}</p>}
+
+        <div className="flex gap-sm justify-end pt-xs">
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={saving}
+            className="px-lg py-sm border border-outline-variant text-on-surface-variant rounded-lg text-label-lg hover:bg-surface-container-low transition-all disabled:opacity-60"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            disabled={saving}
+            className="flex items-center gap-sm px-lg py-sm rounded-lg text-label-lg font-semibold bg-primary text-on-primary hover:opacity-90 transition-all disabled:opacity-60"
+          >
+            {saving && <Spinner className="h-4 w-4" />}
+            Salvar nome
+          </button>
+        </div>
+      </form>
+    </div>
   )
 }
 

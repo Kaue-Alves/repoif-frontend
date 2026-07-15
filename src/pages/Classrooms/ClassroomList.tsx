@@ -215,16 +215,12 @@ function ClassroomCard({ classroom, isTeacher, onDelete }: ClassroomCardProps) {
 
       <div className="absolute left-0 top-0 w-1 h-full bg-primary pointer-events-none" />
 
-      <div className="flex items-start justify-between mb-md pl-xs">
+      <div className="flex items-start mb-md pl-xs">
         <div className="w-10 h-10 rounded-lg bg-primary-container/30 text-primary flex items-center justify-center">
           <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 22, fontVariationSettings: "'FILL' 1" }}>
             groups
           </span>
         </div>
-        <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-surface-container-high text-on-surface-variant">
-          <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
-          Privada
-        </span>
       </div>
 
       <h3 className="text-headline-sm text-on-surface mb-xs pl-xs group-hover:text-primary transition-colors line-clamp-2">
