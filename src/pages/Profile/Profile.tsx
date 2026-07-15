@@ -67,6 +67,10 @@ export default function Profile() {
       {!loading && profile && (() => {
         // A API pode não retornar `subjects` (ex.: perfis de aluno); normaliza para lista vazia.
         const subjects = profile.subjects ?? []
+        const visibleSubjectLabel =
+          isOwner
+            ? (subjects.length === 1 ? 'disciplina' : 'disciplinas')
+            : (subjects.length === 1 ? 'disciplina acessível' : 'disciplinas acessíveis')
         return (
         <>
           {/* Profile Header */}
@@ -103,8 +107,7 @@ export default function Profile() {
 
               {profile.role === 'TEACHER' && (
                 <p className="text-body-md text-on-surface-variant">
-                  {subjects.length}{' '}
-                  {subjects.length === 1 ? 'disciplina pública' : 'disciplinas públicas'}
+                  {subjects.length} {visibleSubjectLabel}
                   {isOwner && ' (você pode ver as privadas também)'}
                 </p>
               )}
@@ -169,7 +172,7 @@ export default function Profile() {
                   <p className="text-body-md text-on-surface-variant">
                     {isOwner
                       ? 'Você ainda não criou nenhuma disciplina.'
-                      : 'Este professor ainda não tem disciplinas públicas.'}
+                      : 'Este professor ainda não tem disciplinas disponíveis para você.'}
                   </p>
                   {isOwner && (
                     <Link
@@ -608,7 +611,7 @@ function PublicSubjectCard({
           </span>
         </div>
 
-        {!subject.isPublic && isOwner && (
+        {!subject.isPublic && (
           <span className="flex items-center gap-xs px-sm py-xs rounded-full text-label-sm font-medium bg-surface-container-high text-on-surface-variant">
             <span aria-hidden="true" className="material-symbols-outlined" style={{ fontSize: 12 }}>lock</span>
             Privada
